@@ -1,0 +1,67 @@
+/* ===========================
+   SIDEBAR PREMIUM ISOLADO
+   =========================== */
+
+.sb-premium {
+  position: fixed;
+  left: 0;
+  top: 0;
+  width: 240px;
+  height: 100vh;
+  background: #0f172a;
+  border-right: 1px solid #1e293b;
+  padding: 24px 18px;
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+  z-index: 9999;
+}
+
+.sb-logo {
+  color: #f8fafc;
+  font-size: 20px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+}
+
+.sb-nav {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.sb-item {
+  padding: 12px 14px;
+  border-radius: 8px;
+  color: #cbd5e1;
+  text-decoration: none;
+  font-size: 15px;
+  background: #1e293b;
+  transition: all 0.25s ease;
+  display: block;
+}
+
+.sb-item:hover {
+  background: #334155;
+  color: #f1f5f9;
+  transform: translateX(4px);
+}
+
+.sb-item.active {
+  background: #3b82f6 !important;
+  color: white !important;
+  font-weight: 600;
+  box-shadow: 0 0 12px rgba(59, 130, 246, 0.4);
+  transform: translateX(6px);
+}
+
+.sb-sair {
+  margin-top: auto;
+  background: #7f1d1d;
+  color: white;
+}
+
+.sb-sair:hover {
+  background: #991b1b;
+}
