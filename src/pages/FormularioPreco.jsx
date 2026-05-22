@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react";
 import { useSearchParams } from "react-router-dom";
 
-import { guardarFichaCompleta, getFichaPorId } from "../state/precos";
+import { guardarFicha, getFichaPorId } from "../state/precos";
 import { getVariaveis } from "../state/variaveis";
 import { listarClientes } from "../state/clientes";
 
@@ -94,22 +94,24 @@ export default function FormularioPreco() {
   async function guardar() {
     if (!cliente.trim()) return;
 
-    await guardarFichaCompleta(cliente.trim(), {
+    await guardarFicha({
+      id: idFicha || undefined,
+      nome_cliente: cliente.trim(),
       referencia,
-      descricaoTecido,
+      descricaotecido: descricaoTecido,
       tecido1,
       tecido2,
-      custoTecido1,
-      custoTecido2,
-      custoTotalTecidos,
-      totalExtras,
+      custotecido1: custoTecido1,
+      custotecido2: custoTecido2,
+      custototaltecidos: custoTotalTecidos,
+      totalextras: totalExtras,
       variaveis: extrasDinamicos,
       margem: margemNum,
       precoFinal,
-      precoComMargem,
+      precocommargem: precoComMargem,
       comissao: comissaoNum,
-      precoComComissao,
-      precoCliente: parseFloat(precoCliente || 0),
+      precocomcomissao: precoComComissao,
+      precocliente: parseFloat(precoCliente || 0),
     });
 
     alert("Ficha guardada!");
