@@ -21,66 +21,70 @@ export default function App() {
       <div className="app-content">
         <Routes>
 
-  <Route path="/login" element={<Login />} />
+          {/* LOGIN */}
+          <Route path="/login" element={<Login />} />
 
-  {/* FORMULÁRIO PRINCIPAL */}
-  <Route
-    path="/"
-    element={
-      <RotaProtegida>
-        <FormularioPreco />
-      </RotaProtegida>
-    }
-  />
+          {/* FORMULÁRIO PRINCIPAL */}
+          <Route
+            path="/"
+            element={
+              <RotaProtegida>
+                <FormularioPreco />
+              </RotaProtegida>
+            }
+          />
 
-  {/* FORMULÁRIO COM PARAMETROS (EDITAR / DUPLICAR) */}
-  <Route
-    path="/formulario"
-    element={
-      <RotaProtegida>
-        <FormularioPreco />
-      </RotaProtegida>
-    }
-  />
+          {/* FORMULÁRIO COM PARAMETROS (EDITAR / DUPLICAR) */}
+          <Route
+            path="/formulario"
+            element={
+              <RotaProtegida>
+                <FormularioPreco />
+              </RotaProtegida>
+            }
+          />
 
-  <Route
-    path="/configurar"
-    element={
-      <RotaProtegida>
-        <ConfigurarVariaveis />
-      </RotaProtegida>
-    }
-  />
+          {/* CONFIGURAR VARIÁVEIS */}
+          <Route
+            path="/configurar"
+            element={
+              <RotaProtegida>
+                <ConfigurarVariaveis />
+              </RotaProtegida>
+            }
+          />
 
-  <Route
-    path="/clientes"
-    element={
-      <RotaProtegida>
-        <Clientes />
-      </RotaProtegida>
-    }
-  />
+          {/* CLIENTES */}
+          <Route
+            path="/clientes"
+            element={
+              <RotaProtegida>
+                <Clientes />
+              </RotaProtegida>
+            }
+          />
 
-  <Route
-    path="/fichas"
-    element={
-      <RotaProtegida>
-        <ListaFichas />
-      </RotaProtegida>
-    }
-  />
+          {/* LISTA DE FICHAS */}
+          <Route
+            path="/fichas"
+            element={
+              <RotaProtegida>
+                <ListaFichas />
+              </RotaProtegida>
+            }
+          />
 
-  <Route
-    path="/cliente/:cliente"
-    element={
-      <RotaProtegida>
-        <FichaCliente />
-      </RotaProtegida>
-    }
-  />
+          {/* VER FICHA POR ID (CORRIGIDO) */}
+          <Route
+            path="/cliente/:id"
+            element={
+              <RotaProtegida>
+                <FichaCliente />
+              </RotaProtegida>
+            }
+          />
 
-</Routes>
-
+        </Routes>
       </div>
     </div>
   );
