@@ -94,42 +94,42 @@ export default function FichaCliente() {
         </div>
       </div>
 
-      {/* BOTÕES */}
-      <div className="ficha-botoes">
+  {/* BOTÕES — VERSÃO FINAL */}
+<div className="ficha-botoes">
 
-        <button
-          className="btn-acao"
-          onClick={() => navigate(`/formulario?id=${ficha.id}`)}
-        >
-          Editar
-        </button>
+  {/* EDITAR */}
+  <button
+    className="btn-acao"
+    onClick={() => navigate(`/formulario?id=${ficha.id}`)}
+  >
+    Editar
+  </button>
 
-        <button
-          className="btn-acao"
-          onClick={() => navigate(`/formulario?duplicar=${ficha.id}`)}
-        >
-          Duplicar
-        </button>
+  {/* DUPLICAR */}
+  <button
+    className="btn-acao"
+    onClick={() => navigate(`/formulario?duplicar=${ficha.id}`)}
+  >
+    Duplicar
+  </button>
 
-        <button className="btn-acao">
-          Exportar PDF
-        </button>
+  {/* VOLTAR */}
+  <button
+    className="btn-apagar"
+    onClick={() => navigate("/fichas")}
+  >
+    Voltar
+  </button>
 
-        <button className="btn-acao">
-          Exportar Excel
-        </button>
+  {/* ÚNICO EXPORTAR EXCEL */}
+  <button
+    className="btn-acao"
+    onClick={() => exportarFichaParaExcel(ficha)}
+  >
+    Exportar Excel
+  </button>
 
-        <button className="btn-apagar" onClick={() => navigate("/fichas")}>
-          Voltar
-        </button>
-<button
-  className="btn-acao"
-  onClick={() => exportarFichaParaExcel(ficha)}
->
-  Exportar Excel
-</button>
+</div>
 
-      </div>
-    </div>
   );
 }
