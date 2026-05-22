@@ -1,5 +1,8 @@
 import { supabase } from "../supabaseClient";
 
+/* ============================================================
+   📌 OBTER TODAS AS FICHAS
+   ============================================================ */
 export async function getTodasFichas() {
   const { data, error } = await supabase
     .from("fichas_preco")
@@ -14,11 +17,14 @@ export async function getTodasFichas() {
   return data || [];
 }
 
-export async function getFichaCliente(cliente) {
+/* ============================================================
+   📌 OBTER FICHA POR ID
+   ============================================================ */
+export async function getFichaPorId(id) {
   const { data, error } = await supabase
     .from("fichas_preco")
     .select("*")
-    .eq("nome_cliente", cliente)
+    .eq("id", id)
     .single();
 
   if (error) {
@@ -29,6 +35,9 @@ export async function getFichaCliente(cliente) {
   return data;
 }
 
+/* ============================================================
+   💾 GUARDAR FICHA COMPLETA
+   ============================================================ */
 export async function guardarFichaCompleta(cliente, dados) {
   const { data: userData } = await supabase.auth.getUser();
   const user = userData?.user;
@@ -42,8 +51,8 @@ export async function guardarFichaCompleta(cliente, dados) {
     nome_cliente: cliente,
     referencia: dados.referencia || "",
     descricao: dados.descricaoTecido || "",
-    valor: dados.precoFinal || 0,          // preço final calculado
-    precocliente: dados.precoCliente || 0, // preço cliente
+    valor: dados.precoFinal || 0,
+    precocliente: dados.precoCliente || 0,
     user_id: user.id,
   };
 
@@ -54,19 +63,25 @@ export async function guardarFichaCompleta(cliente, dados) {
   }
 }
 
-export async function apagarFicha(cliente) {
+/* ============================================================
+   🗑️ APAGAR FICHA POR ID
+   ============================================================ */
+export async function apagarFicha(id) {
   const { error } = await supabase
     .from("fichas_preco")
     .delete()
-    .eq("nome_cliente", cliente);
+    .eq("id", id);
 
   if (error) {
     console.error("Erro ao apagar ficha:", error);
   }
 }
 
-export async function duplicarFicha(cliente) {
-  const ficha = await getFichaCliente(cliente);
+/* ============================================================
+   📄 DUPLICAR FICHA POR ID
+   ============================================================ */
+export async function duplicarFicha(id) {
+  const ficha = await getFichaPorId(id);
   if (!ficha) return;
 
   const nova = {

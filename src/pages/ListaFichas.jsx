@@ -15,17 +15,6 @@ export default function ListaFichas() {
     carregar();
   }, []);
 
-  async function apagarLinha(cliente) {
-    if (!confirm("Apagar ficha deste cliente?")) return;
-    await apagarFicha(cliente);
-    carregar();
-  }
-
-  async function duplicarLinha(cliente) {
-    await duplicarFicha(cliente);
-    carregar();
-  }
-
   return (
     <div className="card-premium">
       <h2 className="titulo-premium">Fichas de Preço</h2>
@@ -42,8 +31,6 @@ export default function ListaFichas() {
               <th>Referência</th>
               <th>Preço Final</th>
               <th>Preço Cliente</th>
-              <th>Margem</th>
-              <th>Comissão</th>
               <th>Ações</th>
             </tr>
           </thead>
@@ -53,36 +40,40 @@ export default function ListaFichas() {
               <tr key={f.id}>
                 <td>{f.nome_cliente}</td>
                 <td>{f.referencia}</td>
-                <td>{(f.precoComComissao || 0).toFixed(2)} €</td>
+                <td>{(f.valor || 0).toFixed(2)} €</td>
                 <td>{(f.precocliente || 0).toFixed(2)} €</td>
-                <td>{f.margem}%</td>
-                <td>{f.comissao}%</td>
 
                 <td>
                   <button
                     className="btn-acao"
-                    onClick={() => navigate(`/formulario?cliente=${f.nome_cliente}`)}
+                    onClick={() => navigate(`/formulario?id=${f.id}`)}
                   >
                     Editar
                   </button>
 
                   <button
                     className="btn-acao"
-                    onClick={() => navigate(`/cliente/${f.nome_cliente}`)}
+                    onClick={() => navigate(`/cliente/${f.id}`)}
                   >
                     Ver Ficha
                   </button>
 
                   <button
                     className="btn-acao"
-                    onClick={() => duplicarLinha(f.nome_cliente)}
+                    onClick={async () => {
+                      await duplicarFicha(f.id);
+                      carregar();
+                    }}
                   >
                     Duplicar
                   </button>
 
                   <button
                     className="btn-apagar"
-                    onClick={() => apagarLinha(f.nome_cliente)}
+                    onClick={async () => {
+                      await apagarFicha(f.id);
+                      carregar();
+                    }}
                   >
                     Apagar
                   </button>
