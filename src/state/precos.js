@@ -27,12 +27,16 @@ export async function getFichaCliente(cliente) {
     .eq("nome_cliente", cliente)
     .single();
 
-  if (error) return null;
+  if (error) {
+    console.error("Erro ao obter ficha:", error);
+    return null;
+  }
+
   return data;
 }
 
 /* ============================================================
-   💾 GUARDAR FICHA COMPLETA
+   💾 GUARDAR FICHA COMPLETA (COMPATÍVEL COM A TABELA REAL)
    ============================================================ */
 export async function guardarFichaCompleta(cliente, dados) {
   const { data: userData } = await supabase.auth.getUser();
@@ -46,33 +50,37 @@ export async function guardarFichaCompleta(cliente, dados) {
   const ficha = {
     nome_cliente: cliente,
     referencia: dados.referencia || "",
-    descricaoTecido: dados.descricaoTecido || "",
+    descricaotecido: dados.descricaoTecido || "",
 
-    tecido1: dados.tecido1 || { consumo: "", preco: "" },
-    tecido2: dados.tecido2 || { consumo: "", preco: "" },
+    tecido1: dados.tecido1 || {},
+    tecido2: dados.tecido2 || {},
 
-    custoTecido1: dados.custoTecido1 || 0,
-    custoTecido2: dados.custoTecido2 || 0,
-    custoTotalTecidos: dados.custoTotalTecidos || 0,
+    custotecido1: dados.custoTecido1 || 0,
+    custotecido2: dados.custoTecido2 || 0,
+    custototaltecidos: dados.custoTotalTecidos || 0,
+    totalextras: dados.totalExtras || 0,
 
-    totalExtras: dados.totalExtras || 0,
     variaveis: dados.variaveis || {},
 
     margem: dados.margem || 0,
-    precoFinal: dados.precoFinal || 0,
-    precoComMargem: dados.precoComMargem || 0,
+    precofinal: dados.precoFinal || 0,
+    precocommargem: dados.precoComMargem || 0,
     comissao: dados.comissao || 0,
-    precoComComissao: dados.precoComComissao || 0,
+    precocomcomissao: dados.precoComComissao || 0,
 
     precocliente: dados.precoCliente || 0,
 
     user_id: user.id,
-    atualizadoEm: new Date().toISOString(),
+    atualizadoem: new Date().toISOString(),
   };
 
-  const { error } = await supabase
+  const { data, error } = await supabase
     .from("fichas_preco")
-    .insert(ficha);
+    .insert(ficha)
+    .select();
+
+  console.log("📌 Enviado:", ficha);
+  console.log("📌 Supabase:", data, error);
 
   if (error) {
     console.error("Erro ao guardar ficha:", error);
@@ -83,10 +91,14 @@ export async function guardarFichaCompleta(cliente, dados) {
    🗑️ APAGAR FICHA
    ============================================================ */
 export async function apagarFicha(cliente) {
-  await supabase
+  const { error } = await supabase
     .from("fichas_preco")
     .delete()
     .eq("nome_cliente", cliente);
+
+  if (error) {
+    console.error("Erro ao apagar ficha:", error);
+  }
 }
 
 /* ============================================================
@@ -100,8 +112,12 @@ export async function duplicarFicha(cliente) {
     ...ficha,
     id: undefined,
     nome_cliente: ficha.nome_cliente + " (cópia)",
-    atualizadoEm: new Date().toISOString(),
+    atualizadoem: new Date().toISOString(),
   };
 
-  await supabase.from("fichas_preco").insert(nova);
+  const { error } = await supabase.from("fichas_preco").insert(nova);
+
+  if (error) {
+    console.error("Erro ao duplicar ficha:", error);
+  }
 }
