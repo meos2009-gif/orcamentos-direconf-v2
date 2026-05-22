@@ -1,8 +1,5 @@
 import { supabase } from "../supabaseClient";
 
-/* ============================================================
-   📌 OBTER TODAS AS FICHAS
-   ============================================================ */
 export async function getTodasFichas() {
   const { data, error } = await supabase
     .from("fichas_preco")
@@ -17,9 +14,6 @@ export async function getTodasFichas() {
   return data || [];
 }
 
-/* ============================================================
-   📌 OBTER FICHA DE UM CLIENTE
-   ============================================================ */
 export async function getFichaCliente(cliente) {
   const { data, error } = await supabase
     .from("fichas_preco")
@@ -35,9 +29,6 @@ export async function getFichaCliente(cliente) {
   return data;
 }
 
-/* ============================================================
-   💾 GUARDAR FICHA COMPLETA (COMPATÍVEL COM A TABELA REAL)
-   ============================================================ */
 export async function guardarFichaCompleta(cliente, dados) {
   const { data: userData } = await supabase.auth.getUser();
   const user = userData?.user;
@@ -50,46 +41,19 @@ export async function guardarFichaCompleta(cliente, dados) {
   const ficha = {
     nome_cliente: cliente,
     referencia: dados.referencia || "",
-    descricaotecido: dados.descricaoTecido || "",
-
-    tecido1: dados.tecido1 || {},
-    tecido2: dados.tecido2 || {},
-
-    custotecido1: dados.custoTecido1 || 0,
-    custotecido2: dados.custoTecido2 || 0,
-    custototaltecidos: dados.custoTotalTecidos || 0,
-    totalextras: dados.totalExtras || 0,
-
-    variaveis: dados.variaveis || {},
-
-    margem: dados.margem || 0,
-    precofinal: dados.precoFinal || 0,
-    precocommargem: dados.precoComMargem || 0,
-    comissao: dados.comissao || 0,
-    precocomcomissao: dados.precoComComissao || 0,
-
-    precocliente: dados.precoCliente || 0,
-
+    descricao: dados.descricaoTecido || "",
+    valor: dados.precoFinal || 0,          // preço final calculado
+    precocliente: dados.precoCliente || 0, // preço cliente
     user_id: user.id,
-    atualizadoem: new Date().toISOString(),
   };
 
-  const { data, error } = await supabase
-    .from("fichas_preco")
-    .insert(ficha)
-    .select();
-
-  console.log("📌 Enviado:", ficha);
-  console.log("📌 Supabase:", data, error);
+  const { error } = await supabase.from("fichas_preco").insert(ficha);
 
   if (error) {
     console.error("Erro ao guardar ficha:", error);
   }
 }
 
-/* ============================================================
-   🗑️ APAGAR FICHA
-   ============================================================ */
 export async function apagarFicha(cliente) {
   const { error } = await supabase
     .from("fichas_preco")
@@ -101,9 +65,6 @@ export async function apagarFicha(cliente) {
   }
 }
 
-/* ============================================================
-   📄 DUPLICAR FICHA
-   ============================================================ */
 export async function duplicarFicha(cliente) {
   const ficha = await getFichaCliente(cliente);
   if (!ficha) return;
@@ -112,7 +73,7 @@ export async function duplicarFicha(cliente) {
     ...ficha,
     id: undefined,
     nome_cliente: ficha.nome_cliente + " (cópia)",
-    atualizadoem: new Date().toISOString(),
+    created_at: new Date().toISOString(),
   };
 
   const { error } = await supabase.from("fichas_preco").insert(nova);

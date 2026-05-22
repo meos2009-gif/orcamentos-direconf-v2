@@ -105,27 +105,11 @@ export default function FormularioPreco() {
     if (!cliente.trim()) return;
 
     await guardarFichaCompleta(cliente.trim(), {
-      referencia,
-      descricaoTecido,
-
-      tecido1,
-      tecido2,
-
-      custoTecido1,
-      custoTecido2,
-      custoTotalTecidos,
-      totalExtras,
-
-      variaveis: extrasDinamicos,
-
-      margem: margemNum,
-      precoFinal: precoFinal,
-      precoComMargem,
-      comissao: comissaoNum,
-      precoComComissao: precoFinal,
-
-      precoCliente: parseFloat(precoCliente || 0),
-    });
+  referencia,
+  descricaoTecido,
+  precoFinal,
+  precoCliente: parseFloat(precoCliente || 0),
+});
 
     alert("Ficha guardada para o cliente: " + cliente);
   }
