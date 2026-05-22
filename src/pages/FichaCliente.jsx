@@ -34,6 +34,7 @@ export default function FichaCliente() {
 
         {/* COLUNA ESQUERDA */}
         <div className="ficha-col">
+
           <h3>Informação Base</h3>
           <p><b>Cliente:</b> {ficha.nome_cliente}</p>
           <p><b>Referência:</b> {ficha.referencia}</p>
@@ -43,22 +44,24 @@ export default function FichaCliente() {
           {ficha.variaveis && Object.keys(ficha.variaveis).length > 0 ? (
             Object.entries(ficha.variaveis).map(([nome, valor]) => (
               <p key={nome}>
-                <b>{nome}:</b> {parseFloat(valor).toFixed(2)} €
+                <b>{nome}:</b> {(parseFloat(valor ?? 0)).toFixed(2)} €
               </p>
             ))
           ) : (
             <p>Sem variáveis adicionais.</p>
           )}
+
         </div>
 
         {/* COLUNA DIREITA */}
         <div className="ficha-col">
+
           <h3>Tecido 1</h3>
           {ficha.tecido1 ? (
             <>
               <p><b>Consumo:</b> {ficha.tecido1.consumo}</p>
               <p><b>Preço:</b> {ficha.tecido1.preco}</p>
-              <p><b>Custo:</b> {ficha.custotecido1.toFixed(2)} €</p>
+              <p><b>Custo:</b> {(ficha.custotecido1 ?? 0).toFixed(2)} €</p>
             </>
           ) : (
             <p>Sem dados.</p>
@@ -69,24 +72,25 @@ export default function FichaCliente() {
             <>
               <p><b>Consumo:</b> {ficha.tecido2.consumo}</p>
               <p><b>Preço:</b> {ficha.tecido2.preco}</p>
-              <p><b>Custo:</b> {ficha.custotecido2.toFixed(2)} €</p>
+              <p><b>Custo:</b> {(ficha.custotecido2 ?? 0).toFixed(2)} €</p>
             </>
           ) : (
             <p>Sem dados.</p>
           )}
 
           <h3>Totais</h3>
-          <p><b>Custo Total Tecidos:</b> {ficha.custototaltecidos.toFixed(2)} €</p>
-          <p><b>Total Extras:</b> {ficha.totalextras.toFixed(2)} €</p>
+          <p><b>Custo Total Tecidos:</b> {(ficha.custototaltecidos ?? 0).toFixed(2)} €</p>
+          <p><b>Total Extras:</b> {(ficha.totalextras ?? 0).toFixed(2)} €</p>
 
-          <p><b>Margem:</b> {ficha.margem}%</p>
-          <p><b>Preço com Margem:</b> {ficha.precocommargem.toFixed(2)} €</p>
+          <p><b>Margem:</b> {ficha.margem ?? 0}%</p>
+          <p><b>Preço com Margem:</b> {(ficha.precocommargem ?? 0).toFixed(2)} €</p>
 
-          <p><b>Comissão:</b> {ficha.comissao}%</p>
-          <p><b>Preço com Comissão:</b> {ficha.precocomcomissao.toFixed(2)} €</p>
+          <p><b>Comissão:</b> {ficha.comissao ?? 0}%</p>
+          <p><b>Preço com Comissão:</b> {(ficha.precocomcomissao ?? 0).toFixed(2)} €</p>
 
-          <p><b>Preço Final:</b> {ficha.precofinal.toFixed(2)} €</p>
-          <p><b>Preço Cliente:</b> {ficha.precocliente.toFixed(2)} €</p>
+          <p><b>Preço Final:</b> {(ficha.precofinal ?? 0).toFixed(2)} €</p>
+          <p><b>Preço Cliente:</b> {(ficha.precocliente ?? 0).toFixed(2)} €</p>
+
         </div>
       </div>
 
