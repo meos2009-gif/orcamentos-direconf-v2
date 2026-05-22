@@ -7,7 +7,7 @@ export default function ListaFichas() {
   const [pesqRef, setPesqRef] = useState("");
 
   async function carregarFichas() {
-    let query = supabase.from("main").select("*");
+    let query = supabase.from("fichas_preco").select("*");
 
     if (pesqCliente.trim() !== "") {
       query = query.ilike("nome_cliente", `%${pesqCliente}%`);

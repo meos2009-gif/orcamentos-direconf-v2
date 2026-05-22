@@ -17,7 +17,7 @@ export default function FichaPreco() {
       return;
     }
 
-    const { error } = await supabase.from("main").insert({
+    const { error } = await supabase.from("fichas_preco").insert({
       nome_cliente: nomeCliente,
       descricao,
       valor,
