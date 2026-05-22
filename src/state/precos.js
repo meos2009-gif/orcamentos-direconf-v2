@@ -32,12 +32,16 @@ export async function getFichaCliente(cliente) {
 }
 
 /* ============================================================
-   💾 GUARDAR / ATUALIZAR FICHA COMPLETA (SUPABASE)
+   💾 GUARDAR FICHA COMPLETA (SUPABASE)
    ============================================================ */
 export async function guardarFichaCompleta(cliente, dados) {
   const { data: userData } = await supabase.auth.getUser();
   const user = userData?.user;
-  if (!user) return;
+
+  if (!user) {
+    console.error("Utilizador não autenticado.");
+    return;
+  }
 
   const ficha = {
     nome_cliente: cliente,
@@ -46,11 +50,16 @@ export async function guardarFichaCompleta(cliente, dados) {
     valor: dados.precoComComissao || 0,
     precocliente: dados.precoCliente || 0,
     user_id: user.id,
+    atualizadoEm: new Date().toISOString(),
   };
 
-  const { error } = await supabase.from("fichas_preco").insert(ficha);
+  const { error } = await supabase
+    .from("fichas_preco")
+    .insert(ficha);
 
-  if (error) console.error("Erro ao guardar ficha:", error);
+  if (error) {
+    console.error("Erro ao guardar ficha:", error);
+  }
 }
 
 /* ============================================================
@@ -72,11 +81,10 @@ export async function duplicarFicha(cliente) {
 
   const nova = {
     ...ficha,
+    id: undefined,
     nome_cliente: ficha.nome_cliente + " (cópia)",
-    created_at: new Date().toISOString(),
+    atualizadoEm: new Date().toISOString(),
   };
-
-  delete nova.id;
 
   await supabase.from("fichas_preco").insert(nova);
 }

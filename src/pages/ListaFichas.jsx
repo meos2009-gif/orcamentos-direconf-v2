@@ -1,58 +1,93 @@
 import { useEffect, useState } from "react";
-import { supabase } from "../supabaseClient";
+import { getTodasFichas, apagarFicha, duplicarFicha } from "../state/precos";
+import { useNavigate } from "react-router-dom";
 
 export default function ListaFichas() {
   const [fichas, setFichas] = useState([]);
-  const [pesqCliente, setPesqCliente] = useState("");
-  const [pesqRef, setPesqRef] = useState("");
+  const navigate = useNavigate();
 
-  async function carregarFichas() {
-    let query = supabase.from("fichas_preco").select("*");
-
-    if (pesqCliente.trim() !== "") {
-      query = query.ilike("nome_cliente", `%${pesqCliente}%`);
-    }
-
-    if (pesqRef.trim() !== "") {
-      query = query.ilike("referencia", `%${pesqRef}%`);
-    }
-
-    const { data, error } = await query.order("created_at", { ascending: false });
-
-    if (!error) setFichas(data);
+  async function carregar() {
+    const lista = await getTodasFichas();
+    setFichas(lista);
   }
 
   useEffect(() => {
-    carregarFichas();
-  }, [pesqCliente, pesqRef]);
+    carregar();
+  }, []);
+
+  async function apagarLinha(cliente) {
+    if (!confirm("Apagar ficha deste cliente?")) return;
+    await apagarFicha(cliente);
+    carregar();
+  }
+
+  async function duplicarLinha(cliente) {
+    await duplicarFicha(cliente);
+    carregar();
+  }
 
   return (
-    <div className="lista-fichas">
+    <div className="card-premium">
+      <h2 className="titulo-premium">Fichas de Preço</h2>
 
-      <div className="filtros">
-        <input
-          type="text"
-          placeholder="Pesquisar Cliente"
-          value={pesqCliente}
-          onChange={(e) => setPesqCliente(e.target.value)}
-        />
+      {fichas.length === 0 && (
+        <p className="texto-vazio">Nenhuma ficha guardada.</p>
+      )}
 
-        <input
-          type="text"
-          placeholder="Pesquisar Referência"
-          value={pesqRef}
-          onChange={(e) => setPesqRef(e.target.value)}
-        />
-      </div>
+      {fichas.length > 0 && (
+        <table className="tabela-premium">
+          <thead>
+            <tr>
+              <th>Cliente</th>
+              <th>Referência</th>
+              <th>Preço Final</th>
+              <th>Preço Cliente</th>
+              <th>Ações</th>
+            </tr>
+          </thead>
 
-      <div className="tabela">
-        {fichas.map((ficha) => (
-          <div key={ficha.id} className="linha">
-            <strong>{ficha.nome_cliente}</strong> — {ficha.referencia}
-          </div>
-        ))}
-      </div>
+          <tbody>
+            {fichas.map((f) => (
+              <tr key={f.id}>
+                <td>{f.nome_cliente}</td>
+                <td>{f.referencia}</td>
+                <td>{(f.valor || 0).toFixed(2)} €</td>
+                <td>{(f.precocliente || 0).toFixed(2)} €</td>
 
+                <td>
+                  <button
+                    className="btn-acao"
+                    onClick={() => navigate(`/formulario?cliente=${f.nome_cliente}`)}
+                  >
+                    Editar
+                  </button>
+
+                  <button
+                    className="btn-acao"
+                    onClick={() => navigate(`/cliente/${f.nome_cliente}`)}
+                  >
+                    Ver Ficha
+                  </button>
+
+                  <button
+                    className="btn-acao"
+                    onClick={() => duplicarLinha(f.nome_cliente)}
+                  >
+                    Duplicar
+                  </button>
+
+                  <button
+                    className="btn-apagar"
+                    onClick={() => apagarLinha(f.nome_cliente)}
+                  >
+                    Apagar
+                  </button>
+                </td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      )}
     </div>
   );
 }
