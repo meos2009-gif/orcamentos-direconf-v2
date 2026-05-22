@@ -34,7 +34,6 @@ export default function FichaCliente() {
 
         {/* COLUNA ESQUERDA */}
         <div className="ficha-col">
-
           <h3>Informação Base</h3>
           <p><b>Cliente:</b> {ficha.nome_cliente}</p>
           <p><b>Referência:</b> {ficha.referencia}</p>
@@ -50,12 +49,10 @@ export default function FichaCliente() {
           ) : (
             <p>Sem variáveis adicionais.</p>
           )}
-
         </div>
 
         {/* COLUNA DIREITA */}
         <div className="ficha-col">
-
           <h3>Tecido 1</h3>
           {ficha.tecido1 ? (
             <>
@@ -90,47 +87,41 @@ export default function FichaCliente() {
 
           <p><b>Preço Final:</b> {ficha.precofinal.toFixed(2)} €</p>
           <p><b>Preço Cliente:</b> {ficha.precocliente.toFixed(2)} €</p>
-
         </div>
       </div>
 
- {/* BOTÕES — VERSÃO FINAL */}
-<div className="ficha-botoes">
+      {/* BOTÕES — VERSÃO FINAL */}
+      <div className="ficha-botoes">
 
-  {/* EDITAR */}
-  <button
-    className="btn-acao"
-    onClick={() => navigate(`/formulario?id=${ficha.id}`)}
-  >
-    Editar
-  </button>
+        <button
+          className="btn-acao"
+          onClick={() => navigate(`/formulario?id=${ficha.id}`)}
+        >
+          Editar
+        </button>
 
-  {/* DUPLICAR */}
-  <button
-    className="btn-acao"
-    onClick={() => navigate(`/formulario?duplicar=${ficha.id}`)}
-  >
-    Duplicar
-  </button>
+        <button
+          className="btn-acao"
+          onClick={() => navigate(`/formulario?duplicar=${ficha.id}`)}
+        >
+          Duplicar
+        </button>
 
-  {/* VOLTAR */}
-  <button
-    className="btn-apagar"
-    onClick={() => navigate("/fichas")}
-  >
-    Voltar
-  </button>
+        <button
+          className="btn-apagar"
+          onClick={() => navigate("/fichas")}
+        >
+          Voltar
+        </button>
 
-  {/* ÚNICO EXPORTAR EXCEL */}
-  <button
-    className="btn-acao"
-    onClick={() => exportarFichaParaExcel(ficha)}
-  >
-    Exportar Excel
-  </button>
+        <button
+          className="btn-acao"
+          onClick={() => exportarFichaParaExcel(ficha)}
+        >
+          Exportar Excel
+        </button>
 
-</div>
-
-
+      </div>
+    </div>
   );
 }
