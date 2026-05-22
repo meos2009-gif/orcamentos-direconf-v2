@@ -8,6 +8,7 @@ import { listarClientes } from "../state/clientes";
 export default function FormularioPreco() {
   const [params] = useSearchParams();
   const idFicha = params.get("id");
+  const duplicarId = params.get("duplicar");
 
   const [clientesDB, setClientesDB] = useState([]);
 
@@ -26,7 +27,7 @@ export default function FormularioPreco() {
 
   const [precoCliente, setPrecoCliente] = useState("");
 
-  // Carregar variáveis dinâmicas
+  // Carregar variáveis
   useEffect(() => {
     setVariaveis(getVariaveis());
   }, []);
@@ -40,22 +41,33 @@ export default function FormularioPreco() {
     carregar();
   }, []);
 
-  // Carregar ficha para edição
+  // Carregar ficha para edição ou duplicação
   useEffect(() => {
     async function carregarFicha() {
-      if (!idFicha) return;
+      if (!idFicha && !duplicarId) return;
 
-      const ficha = await getFichaPorId(idFicha);
+      const ficha = await getFichaPorId(idFicha || duplicarId);
       if (!ficha) return;
 
-      setCliente(ficha.nome_cliente);
+      setCliente(
+        duplicarId ? ficha.nome_cliente + " (cópia)" : ficha.nome_cliente
+      );
       setReferencia(ficha.referencia);
-      setDescricaoTecido(ficha.descricao || "");
-      setPrecoCliente(ficha.precocliente || "");
+      setDescricaoTecido(ficha.descricaotecido);
+
+      setTecido1(ficha.tecido1 || {});
+      setTecido2(ficha.tecido2 || {});
+
+      setExtrasDinamicos(ficha.variaveis || {});
+
+      setMargem(ficha.margem);
+      setComissao(ficha.comissao);
+
+      setPrecoCliente(ficha.precocliente);
     }
 
     carregarFicha();
-  }, [idFicha]);
+  }, [idFicha, duplicarId]);
 
   // Cálculos
   const custoTecido1 =
@@ -72,19 +84,31 @@ export default function FormularioPreco() {
   );
 
   const margemNum = parseFloat(margem || 0);
-  const precoCusto = custoTotalTecidos + totalExtras;
-  const precoComMargem = precoCusto * (1 + margemNum / 100);
+  const precoFinal = custoTotalTecidos + totalExtras;
+  const precoComMargem = precoFinal * (1 + margemNum / 100);
 
   const comissaoNum = parseFloat(comissao || 0);
-  const precoFinal = precoComMargem * (1 + comissaoNum / 100);
+  const precoComComissao = precoComMargem * (1 + comissaoNum / 100);
 
+  // Guardar ficha
   async function guardar() {
     if (!cliente.trim()) return;
 
     await guardarFichaCompleta(cliente.trim(), {
       referencia,
       descricaoTecido,
+      tecido1,
+      tecido2,
+      custoTecido1,
+      custoTecido2,
+      custoTotalTecidos,
+      totalExtras,
+      variaveis: extrasDinamicos,
+      margem: margemNum,
       precoFinal,
+      precoComMargem,
+      comissao: comissaoNum,
+      precoComComissao,
       precoCliente: parseFloat(precoCliente || 0),
     });
 
@@ -94,6 +118,7 @@ export default function FormularioPreco() {
   return (
     <div className="form-premium-layout">
 
+      {/* COLUNA ESQUERDA */}
       <div className="form-col-esquerda">
 
         <div className="form-card">
@@ -123,11 +148,19 @@ export default function FormularioPreco() {
             onChange={(e) => setReferencia(e.target.value)}
           />
 
-          <label>Descrição</label>
+          <label>Descrição do tecido</label>
           <input
             className="input-premium"
             value={descricaoTecido}
             onChange={(e) => setDescricaoTecido(e.target.value)}
+          />
+
+          <label>Preço Cliente</label>
+          <input
+            className="input-premium"
+            type="number"
+            value={precoCliente}
+            onChange={(e) => setPrecoCliente(e.target.value)}
           />
         </div>
 
@@ -154,6 +187,7 @@ export default function FormularioPreco() {
 
       </div>
 
+      {/* COLUNA DIREITA */}
       <div className="form-col-direita">
 
         <div className="form-card">
@@ -211,8 +245,8 @@ export default function FormularioPreco() {
         <div className="form-card">
           <h3>Totais</h3>
 
-          <p>Preço de Custo: <b>{precoCusto.toFixed(2)} €</b></p>
-          <p>Preço com Margem: <b>{precoComMargem.toFixed(2)} €</b></p>
+          <p>Custo Total Tecidos: <b>{custoTotalTecidos.toFixed(2)} €</b></p>
+          <p>Total Extras: <b>{totalExtras.toFixed(2)} €</b></p>
 
           <label>Margem (%)</label>
           <input
@@ -229,13 +263,8 @@ export default function FormularioPreco() {
           />
 
           <p>Preço Final: <b>{precoFinal.toFixed(2)} €</b></p>
-
-          <label>Preço Cliente</label>
-          <input
-            className="input-premium"
-            value={precoCliente}
-            onChange={(e) => setPrecoCliente(e.target.value)}
-          />
+          <p>Preço com Margem: <b>{precoComMargem.toFixed(2)} €</b></p>
+          <p>Preço com Comissão: <b>{precoComComissao.toFixed(2)} €</b></p>
 
           <button className="btn-guardar" onClick={guardar}>
             Guardar Ficha
