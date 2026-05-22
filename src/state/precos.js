@@ -1,108 +1,82 @@
 import { supabase } from "../supabaseClient";
 
 /* ============================================================
-   🔐 CHAVE POR UTILIZADOR (ASSÍNCRONO E CORRETO)
-   ============================================================ */
-export async function getUserKey() {
-  const { data } = await supabase.auth.getSession();
-  const user = data?.session?.user;
-  if (!user) return null;
-  return "fichas_" + user.id;
-}
-
-/* ============================================================
-   📌 OBTER TODAS AS FICHAS
+   📌 OBTER TODAS AS FICHAS (SUPABASE)
    ============================================================ */
 export async function getTodasFichas() {
-  const key = await getUserKey();
-  if (!key) return [];
-  return JSON.parse(localStorage.getItem(key) || "[]");
-}
+  const { data, error } = await supabase
+    .from("fichas_preco")
+    .select("*")
+    .order("created_at", { ascending: false });
 
-/* ============================================================
-   📌 OBTER FICHA DE UM CLIENTE
-   ============================================================ */
-export async function getFichaCliente(cliente) {
-  const fichas = await getTodasFichas();
-  return fichas.find((f) => f.cliente === cliente) || null;
-}
-
-/* ============================================================
-   💾 GUARDAR / ATUALIZAR FICHA COMPLETA
-   ============================================================ */
-export async function guardarFichaCompleta(cliente, dados) {
-  const key = await getUserKey();
-  if (!key) return;
-
-  const fichas = await getTodasFichas();
-
-  const index = fichas.findIndex((f) => f.cliente === cliente);
-
-  const novaFicha = {
-  cliente,
-  referencia: dados.referencia || "",
-  descricaoTecido: dados.descricaoTecido || "",
-  tecido1: dados.tecido1 || { consumo: "", preco: "" },
-  tecido2: dados.tecido2 || { consumo: "", preco: "" },
-
-  custoTecido1: dados.custoTecido1 || 0,
-  custoTecido2: dados.custoTecido2 || 0,
-  custoTotalTecidos: dados.custoTotalTecidos || 0,
-
-  totalExtras: dados.totalExtras || 0,
-  variaveis: dados.variaveis || {},
-
-  margem: dados.margem || 0,
-  precoFinal: dados.precoFinal || 0,
-  precoComMargem: dados.precoComMargem || 0,
-  comissao: dados.comissao || 0,
-  precoComComissao: dados.precoComComissao || 0,
-
-  // ⭐ NOVO CAMPO — AGORA VAI GUARDAR
-  precoCliente: dados.precoCliente || 0,
-
-  atualizadoEm: new Date().toISOString(),
-};
-
-  if (index >= 0) {
-    fichas[index] = novaFicha;
-  } else {
-    fichas.push(novaFicha);
+  if (error) {
+    console.error("Erro ao carregar fichas:", error);
+    return [];
   }
 
-  localStorage.setItem(key, JSON.stringify(fichas));
+  return data || [];
 }
 
 /* ============================================================
-   🗑️ APAGAR FICHA
+   📌 OBTER FICHA DE UM CLIENTE (SUPABASE)
    ============================================================ */
-export async function apagarFicha(cliente) {
-  const key = await getUserKey();
-  if (!key) return;
+export async function getFichaCliente(cliente) {
+  const { data, error } = await supabase
+    .from("fichas_preco")
+    .select("*")
+    .eq("nome_cliente", cliente)
+    .single();
 
-  const fichas = await getTodasFichas();
-  const novas = fichas.filter((f) => f.cliente !== cliente);
-
-  localStorage.setItem(key, JSON.stringify(novas));
+  if (error) return null;
+  return data;
 }
 
 /* ============================================================
-   📄 DUPLICAR FICHA
+   💾 GUARDAR / ATUALIZAR FICHA COMPLETA (SUPABASE)
    ============================================================ */
-export async function duplicarFicha(cliente) {
-  const key = await getUserKey();
-  if (!key) return;
+export async function guardarFichaCompleta(cliente, dados) {
+  const { data: userData } = await supabase.auth.getUser();
+  const user = userData?.user;
+  if (!user) return;
 
-  const fichas = await getTodasFichas();
-  const ficha = fichas.find((f) => f.cliente === cliente);
-  if (!ficha) return;
-
-  const novaFicha = {
-    ...ficha,
-    cliente: ficha.cliente + " (cópia)",
-    atualizadoEm: new Date().toISOString(),
+  const ficha = {
+    nome_cliente: cliente,
+    referencia: dados.referencia || "",
+    descricao: dados.descricaoTecido || "",
+    valor: dados.precoComComissao || 0,
+    precocliente: dados.precoCliente || 0,
+    user_id: user.id,
   };
 
-  fichas.push(novaFicha);
-  localStorage.setItem(key, JSON.stringify(fichas));
+  const { error } = await supabase.from("fichas_preco").insert(ficha);
+
+  if (error) console.error("Erro ao guardar ficha:", error);
+}
+
+/* ============================================================
+   🗑️ APAGAR FICHA (SUPABASE)
+   ============================================================ */
+export async function apagarFicha(cliente) {
+  await supabase
+    .from("fichas_preco")
+    .delete()
+    .eq("nome_cliente", cliente);
+}
+
+/* ============================================================
+   📄 DUPLICAR FICHA (SUPABASE)
+   ============================================================ */
+export async function duplicarFicha(cliente) {
+  const ficha = await getFichaCliente(cliente);
+  if (!ficha) return;
+
+  const nova = {
+    ...ficha,
+    nome_cliente: ficha.nome_cliente + " (cópia)",
+    created_at: new Date().toISOString(),
+  };
+
+  delete nova.id;
+
+  await supabase.from("fichas_preco").insert(nova);
 }
