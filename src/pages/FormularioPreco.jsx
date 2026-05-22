@@ -25,7 +25,6 @@ export default function FormularioPreco() {
   const [margem, setMargem] = useState("");
   const [comissao, setComissao] = useState("");
 
-  // ⭐ NOVO CAMPO
   const [precoCliente, setPrecoCliente] = useState("");
 
   useEffect(() => {
@@ -33,27 +32,29 @@ export default function FormularioPreco() {
   }, []);
 
   useEffect(() => {
-    async function carregar() {
+    async function carregarClientes() {
       const { data } = await listarClientes();
       setClientesDB(data || []);
     }
-    carregar();
+    carregarClientes();
   }, []);
 
   useEffect(() => {
-    async function carregar() {
+    async function carregarFicha() {
       if (clienteEditar) {
         const ficha = await getFichaCliente(clienteEditar);
         if (ficha) {
-          setCliente(clienteEditar);
+          setCliente(ficha.nome_cliente);
           setReferencia(ficha.referencia);
-          setDescricaoTecido(ficha.descricaoTecido);
-          setTecido1(ficha.tecido1);
-          setTecido2(ficha.tecido2);
-          setExtrasDinamicos(ficha.variaveis);
-          setMargem(ficha.margem);
-          setComissao(ficha.comissao);
-          setPrecoCliente(ficha.precoCliente || "");
+          setDescricaoTecido(ficha.descricaoTecido || "");
+
+          setTecido1(ficha.tecido1 || { consumo: "", preco: "" });
+          setTecido2(ficha.tecido2 || { consumo: "", preco: "" });
+
+          setExtrasDinamicos(ficha.variaveis || {});
+          setMargem(ficha.margem || "");
+          setComissao(ficha.comissao || "");
+          setPrecoCliente(ficha.precocliente || "");
         }
         return;
       }
@@ -61,21 +62,23 @@ export default function FormularioPreco() {
       if (clienteDuplicar) {
         const ficha = await getFichaCliente(clienteDuplicar);
         if (ficha) {
-          setCliente(ficha.cliente + " (cópia)");
+          setCliente(ficha.nome_cliente + " (cópia)");
           setReferencia(ficha.referencia);
-          setDescricaoTecido(ficha.descricaoTecido);
-          setTecido1(ficha.tecido1);
-          setTecido2(ficha.tecido2);
-          setExtrasDinamicos(ficha.variaveis);
-          setMargem(ficha.margem);
-          setComissao(ficha.comissao);
-          setPrecoCliente(ficha.precoCliente || "");
+          setDescricaoTecido(ficha.descricaoTecido || "");
+
+          setTecido1(ficha.tecido1 || { consumo: "", preco: "" });
+          setTecido2(ficha.tecido2 || { consumo: "", preco: "" });
+
+          setExtrasDinamicos(ficha.variaveis || {});
+          setMargem(ficha.margem || "");
+          setComissao(ficha.comissao || "");
+          setPrecoCliente(ficha.precocliente || "");
         }
         return;
       }
     }
 
-    carregar();
+    carregarFicha();
   }, [clienteEditar, clienteDuplicar]);
 
   const custoTecido1 =
@@ -104,19 +107,24 @@ export default function FormularioPreco() {
     await guardarFichaCompleta(cliente.trim(), {
       referencia,
       descricaoTecido,
+
       tecido1,
       tecido2,
+
       custoTecido1,
       custoTecido2,
       custoTotalTecidos,
       totalExtras,
+
       variaveis: extrasDinamicos,
+
       margem: margemNum,
-      precoFinal: precoCusto,
+      precoFinal: precoFinal,
       precoComMargem,
       comissao: comissaoNum,
       precoComComissao: precoFinal,
-      precoCliente: parseFloat(precoCliente || 0), // ⭐ NOVO CAMPO
+
+      precoCliente: parseFloat(precoCliente || 0),
     });
 
     alert("Ficha guardada para o cliente: " + cliente);
