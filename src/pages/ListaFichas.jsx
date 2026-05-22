@@ -15,6 +15,17 @@ export default function ListaFichas() {
     carregar();
   }, []);
 
+  async function apagarLinha(id) {
+    if (!confirm("Apagar esta ficha?")) return;
+    await apagarFicha(id);
+    carregar();
+  }
+
+  async function duplicarLinha(id) {
+    await duplicarFicha(id);
+    carregar();
+  }
+
   return (
     <div className="card-premium">
       <h2 className="titulo-premium">Fichas de Preço</h2>
@@ -31,6 +42,8 @@ export default function ListaFichas() {
               <th>Referência</th>
               <th>Preço Final</th>
               <th>Preço Cliente</th>
+              <th>Margem</th>
+              <th>Comissão</th>
               <th>Ações</th>
             </tr>
           </thead>
@@ -40,10 +53,15 @@ export default function ListaFichas() {
               <tr key={f.id}>
                 <td>{f.nome_cliente}</td>
                 <td>{f.referencia}</td>
-                <td>{(f.valor || 0).toFixed(2)} €</td>
+
+                <td>{(f.precofinal || 0).toFixed(2)} €</td>
                 <td>{(f.precocliente || 0).toFixed(2)} €</td>
 
-                <td>
+                <td>{f.margem}%</td>
+                <td>{f.comissao}%</td>
+
+                <td className="acoes-coluna">
+
                   <button
                     className="btn-acao"
                     onClick={() => navigate(`/formulario?id=${f.id}`)}
@@ -60,23 +78,18 @@ export default function ListaFichas() {
 
                   <button
                     className="btn-acao"
-                    onClick={async () => {
-                      await duplicarFicha(f.id);
-                      carregar();
-                    }}
+                    onClick={() => duplicarLinha(f.id)}
                   >
                     Duplicar
                   </button>
 
                   <button
                     className="btn-apagar"
-                    onClick={async () => {
-                      await apagarFicha(f.id);
-                      carregar();
-                    }}
+                    onClick={() => apagarLinha(f.id)}
                   >
                     Apagar
                   </button>
+
                 </td>
               </tr>
             ))}

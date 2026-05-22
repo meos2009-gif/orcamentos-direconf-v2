@@ -50,10 +50,28 @@ export async function guardarFichaCompleta(cliente, dados) {
   const ficha = {
     nome_cliente: cliente,
     referencia: dados.referencia || "",
-    descricao: dados.descricaoTecido || "",
-    valor: dados.precoFinal || 0,
+    descricaotecido: dados.descricaoTecido || "",
+
+    tecido1: dados.tecido1 || {},
+    tecido2: dados.tecido2 || {},
+
+    custotecido1: dados.custoTecido1 || 0,
+    custotecido2: dados.custoTecido2 || 0,
+    custototaltecidos: dados.custoTotalTecidos || 0,
+    totalextras: dados.totalExtras || 0,
+
+    variaveis: dados.variaveis || {},
+
+    margem: dados.margem || 0,
+    precocommargem: dados.precoComMargem || 0,
+    comissao: dados.comissao || 0,
+    precofinal: dados.precoFinal || 0,
+    precocomcomissao: dados.precoComComissao || 0,
+
     precocliente: dados.precoCliente || 0,
+
     user_id: user.id,
+    atualizadoem: new Date().toISOString(),
   };
 
   const { error } = await supabase.from("fichas_preco").insert(ficha);
@@ -89,6 +107,7 @@ export async function duplicarFicha(id) {
     id: undefined,
     nome_cliente: ficha.nome_cliente + " (cópia)",
     created_at: new Date().toISOString(),
+    atualizadoem: new Date().toISOString(),
   };
 
   const { error } = await supabase.from("fichas_preco").insert(nova);

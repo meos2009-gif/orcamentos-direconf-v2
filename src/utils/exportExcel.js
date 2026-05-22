@@ -1,110 +1,61 @@
 import * as XLSX from "xlsx";
 
-export function exportarExcelCliente(nome, ficha) {
-  const wsData = [
-    ["FICHA DE PREÇO DO CLIENTE"],
-    [],
-    ["Cliente:", nome],
-    ["Referência:", ficha.referencia],
-    ["Descrição do Tecido:", ficha.descricaoTecido],
-    [],
-    ["CUSTO DOS TECIDOS"],
-    ["Tecido 1", "", "", ficha.custoTecido1.toFixed(2) + " €"],
-    ["Tecido 2", "", "", ficha.custoTecido2.toFixed(2) + " €"],
-    ["Custo Total Tecidos:", "", "", ficha.custoTotalTecidos.toFixed(2) + " €"],
-    [],
-    ["CUSTOS VARIÁVEIS"],
-    ...Object.entries(ficha.variaveis || {}).map(([k, v]) => [
-      k,
-      "",
-      "",
-      parseFloat(v).toFixed(2) + " €",
-    ]),
-    ["Total Extras:", "", "", ficha.totalExtras.toFixed(2) + " €"],
-    [],
-    ["MARGEM E COMISSÃO"],
-    ["Margem:", "", "", ficha.margem + " %"],
-    ["Preço com Margem:", "", "", ficha.precoComMargem.toFixed(2) + " €"],
-    ["Comissão:", "", "", ficha.comissao + " %"],
-    ["Preço Final c/ Comissão:", "", "", ficha.precoComComissao.toFixed(2) + " €"],
-    [],
-    ["RESUMO FINAL"],
-    ["Custo Total Tecidos:", "", "", ficha.custoTotalTecidos.toFixed(2) + " €"],
-    ["Total Extras:", "", "", ficha.totalExtras.toFixed(2) + " €"],
-    ["Preço Final s/ Comissão:", "", "", ficha.precoComMargem.toFixed(2) + " €"],
-    ["Preço Final c/ Comissão:", "", "", ficha.precoComComissao.toFixed(2) + " €"],
-    [],
-    ["ASSINATURA / OBSERVAÇÕES"],
-    [""],
-    [""],
-    [""],
-  ];
+export function exportarFichaParaExcel(ficha) {
+  if (!ficha) return;
 
-  const ws = XLSX.utils.aoa_to_sheet(wsData);
+  const linhas = [];
 
-  // Largura das colunas (mais largo, mais premium)
-  ws["!cols"] = [
-    { wch: 35 },
-    { wch: 20 },
-    { wch: 20 },
-    { wch: 25 },
-  ];
+  // Informação base
+  linhas.push(["Cliente", ficha.nome_cliente]);
+  linhas.push(["Referência", ficha.referencia]);
+  linhas.push(["Descrição do tecido", ficha.descricaotecido]);
+  linhas.push([]);
 
-  // Altura das linhas (mais presença)
-  ws["!rows"] = Array(wsData.length).fill({ hpt: 26 });
+  // Tecidos
+  linhas.push(["Tecido 1"]);
+  linhas.push(["Consumo", ficha.tecido1?.consumo || ""]);
+  linhas.push(["Preço", ficha.tecido1?.preco || ""]);
+  linhas.push(["Custo", ficha.custotecido1?.toFixed(2) || "0.00"]);
+  linhas.push([]);
 
-  // Estilos premium
-  const headerStyle = {
-    font: { bold: true, sz: 16, color: { rgb: "FFFFFF" } },
-    fill: { fgColor: { rgb: "1E293B" } },
-    alignment: { horizontal: "center" },
-  };
+  linhas.push(["Tecido 2"]);
+  linhas.push(["Consumo", ficha.tecido2?.consumo || ""]);
+  linhas.push(["Preço", ficha.tecido2?.preco || ""]);
+  linhas.push(["Custo", ficha.custotecido2?.toFixed(2) || "0.00"]);
+  linhas.push([]);
 
-  const sectionStyle = {
-    font: { bold: true, sz: 13, color: { rgb: "FFFFFF" } },
-    fill: { fgColor: { rgb: "334155" } },
-  };
+  // Variáveis dinâmicas
+  linhas.push(["Custos Variáveis"]);
+  if (ficha.variaveis && Object.keys(ficha.variaveis).length > 0) {
+    Object.entries(ficha.variaveis).forEach(([nome, valor]) => {
+      linhas.push([nome, parseFloat(valor).toFixed(2)]);
+    });
+  } else {
+    linhas.push(["Nenhuma variável"]);
+  }
+  linhas.push([]);
 
-  const labelStyle = {
-    font: { bold: true },
-    alignment: { horizontal: "left" },
-  };
+  // Totais
+  linhas.push(["Totais"]);
+  linhas.push(["Custo Total Tecidos", ficha.custototaltecidos?.toFixed(2)]);
+  linhas.push(["Total Extras", ficha.totalextras?.toFixed(2)]);
+  linhas.push(["Margem (%)", ficha.margem]);
+  linhas.push(["Preço com Margem", ficha.precocommargem?.toFixed(2)]);
+  linhas.push(["Comissão (%)", ficha.comissao]);
+  linhas.push(["Preço com Comissão", ficha.precocomcomissao?.toFixed(2)]);
+  linhas.push(["Preço Final", ficha.precofinal?.toFixed(2)]);
+  linhas.push(["Preço Cliente", ficha.precocliente?.toFixed(2)]);
+  linhas.push([]);
 
-  const valueStyle = {
-    alignment: { horizontal: "right" },
-  };
-
-  // Aplicar estilos
-  Object.keys(ws).forEach((cell) => {
-    if (cell.startsWith("A1")) ws[cell].s = headerStyle;
-
-    const row = parseInt(cell.replace(/[A-Z]/g, ""));
-    const col = cell.replace(/[0-9]/g, "");
-
-    // Secções
-    if (
-      ws[cell].v === "CUSTO DOS TECIDOS" ||
-      ws[cell].v === "CUSTOS VARIÁVEIS" ||
-      ws[cell].v === "MARGEM E COMISSÃO" ||
-      ws[cell].v === "RESUMO FINAL" ||
-      ws[cell].v === "ASSINATURA / OBSERVAÇÕES"
-    ) {
-      ws[cell].s = sectionStyle;
-    }
-
-    // Labels
-    if (col === "A" && row > 1 && ws[cell].v && typeof ws[cell].v === "string") {
-      ws[cell].s = labelStyle;
-    }
-
-    // Valores
-    if (col === "D" && row > 1) {
-      ws[cell].s = valueStyle;
-    }
-  });
-
+  // Criar workbook
+  const ws = XLSX.utils.aoa_to_sheet(linhas);
   const wb = XLSX.utils.book_new();
-  XLSX.utils.book_append_sheet(wb, ws, "Ficha");
+  XLSX.utils.book_append_sheet(wb, ws, "Ficha de Preço");
 
-  XLSX.writeFile(wb, `Ficha_${nome}.xlsx`);
+  // Nome do ficheiro
+  const nomeFicheiro = `Ficha_${ficha.nome_cliente}_${ficha.referencia || ""}.xlsx`
+    .replace(/\s+/g, "_")
+    .replace(/[()]/g, "");
+
+  XLSX.writeFile(wb, nomeFicheiro);
 }

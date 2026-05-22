@@ -1,9 +1,12 @@
 import { useEffect, useState } from "react";
-import { useParams } from "react-router-dom";
+import { useParams, useNavigate } from "react-router-dom";
 import { getFichaPorId } from "../state/precos";
+import { exportarFichaParaExcel } from "../utils/exportExcel";
 
 export default function FichaCliente() {
   const { id } = useParams();
+  const navigate = useNavigate();
+
   const [ficha, setFicha] = useState(null);
 
   useEffect(() => {
@@ -16,21 +19,117 @@ export default function FichaCliente() {
   }, [id]);
 
   if (!ficha) {
-    return <p style={{ color: "#fff", padding: "20px" }}>A carregar ficha...</p>;
+    return (
+      <div className="card-premium" style={{ padding: "20px" }}>
+        <p>A carregar ficha...</p>
+      </div>
+    );
   }
 
   return (
     <div className="card-premium" style={{ padding: "30px" }}>
-      <h2 className="titulo-premium">Ficha de Preço</h2>
+      <h2 className="titulo-premium">Ficha de Preço — {ficha.nome_cliente}</h2>
 
-      <p><b>Cliente:</b> {ficha.nome_cliente}</p>
-      <p><b>Referência:</b> {ficha.referencia}</p>
-      <p><b>Descrição:</b> {ficha.descricao}</p>
+      <div className="ficha-grid">
 
-      <p><b>Preço Final:</b> {ficha.valor?.toFixed(2)} €</p>
-      <p><b>Preço Cliente:</b> {ficha.precocliente?.toFixed(2)} €</p>
+        {/* COLUNA ESQUERDA */}
+        <div className="ficha-col">
 
-      <p><b>Criado em:</b> {new Date(ficha.created_at).toLocaleString()}</p>
+          <h3>Informação Base</h3>
+          <p><b>Cliente:</b> {ficha.nome_cliente}</p>
+          <p><b>Referência:</b> {ficha.referencia}</p>
+          <p><b>Descrição do tecido:</b> {ficha.descricaotecido}</p>
+
+          <h3>Custos Variáveis</h3>
+          {ficha.variaveis && Object.keys(ficha.variaveis).length > 0 ? (
+            Object.entries(ficha.variaveis).map(([nome, valor]) => (
+              <p key={nome}>
+                <b>{nome}:</b> {parseFloat(valor).toFixed(2)} €
+              </p>
+            ))
+          ) : (
+            <p>Sem variáveis adicionais.</p>
+          )}
+
+        </div>
+
+        {/* COLUNA DIREITA */}
+        <div className="ficha-col">
+
+          <h3>Tecido 1</h3>
+          {ficha.tecido1 ? (
+            <>
+              <p><b>Consumo:</b> {ficha.tecido1.consumo}</p>
+              <p><b>Preço:</b> {ficha.tecido1.preco}</p>
+              <p><b>Custo:</b> {ficha.custotecido1.toFixed(2)} €</p>
+            </>
+          ) : (
+            <p>Sem dados.</p>
+          )}
+
+          <h3>Tecido 2</h3>
+          {ficha.tecido2 ? (
+            <>
+              <p><b>Consumo:</b> {ficha.tecido2.consumo}</p>
+              <p><b>Preço:</b> {ficha.tecido2.preco}</p>
+              <p><b>Custo:</b> {ficha.custotecido2.toFixed(2)} €</p>
+            </>
+          ) : (
+            <p>Sem dados.</p>
+          )}
+
+          <h3>Totais</h3>
+          <p><b>Custo Total Tecidos:</b> {ficha.custototaltecidos.toFixed(2)} €</p>
+          <p><b>Total Extras:</b> {ficha.totalextras.toFixed(2)} €</p>
+
+          <p><b>Margem:</b> {ficha.margem}%</p>
+          <p><b>Preço com Margem:</b> {ficha.precocommargem.toFixed(2)} €</p>
+
+          <p><b>Comissão:</b> {ficha.comissao}%</p>
+          <p><b>Preço com Comissão:</b> {ficha.precocomcomissao.toFixed(2)} €</p>
+
+          <p><b>Preço Final:</b> {ficha.precofinal.toFixed(2)} €</p>
+          <p><b>Preço Cliente:</b> {ficha.precocliente.toFixed(2)} €</p>
+
+        </div>
+      </div>
+
+      {/* BOTÕES */}
+      <div className="ficha-botoes">
+
+        <button
+          className="btn-acao"
+          onClick={() => navigate(`/formulario?id=${ficha.id}`)}
+        >
+          Editar
+        </button>
+
+        <button
+          className="btn-acao"
+          onClick={() => navigate(`/formulario?duplicar=${ficha.id}`)}
+        >
+          Duplicar
+        </button>
+
+        <button className="btn-acao">
+          Exportar PDF
+        </button>
+
+        <button className="btn-acao">
+          Exportar Excel
+        </button>
+
+        <button className="btn-apagar" onClick={() => navigate("/fichas")}>
+          Voltar
+        </button>
+<button
+  className="btn-acao"
+  onClick={() => exportarFichaParaExcel(ficha)}
+>
+  Exportar Excel
+</button>
+
+      </div>
     </div>
   );
 }
