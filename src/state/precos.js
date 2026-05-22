@@ -1,7 +1,7 @@
 import { supabase } from "../supabaseClient";
 
 /* ============================================================
-   📌 OBTER TODAS AS FICHAS (SUPABASE)
+   📌 OBTER TODAS AS FICHAS
    ============================================================ */
 export async function getTodasFichas() {
   const { data, error } = await supabase
@@ -18,7 +18,7 @@ export async function getTodasFichas() {
 }
 
 /* ============================================================
-   📌 OBTER FICHA DE UM CLIENTE (SUPABASE)
+   📌 OBTER FICHA DE UM CLIENTE
    ============================================================ */
 export async function getFichaCliente(cliente) {
   const { data, error } = await supabase
@@ -32,7 +32,7 @@ export async function getFichaCliente(cliente) {
 }
 
 /* ============================================================
-   💾 GUARDAR FICHA COMPLETA (SUPABASE)
+   💾 GUARDAR FICHA COMPLETA
    ============================================================ */
 export async function guardarFichaCompleta(cliente, dados) {
   const { data: userData } = await supabase.auth.getUser();
@@ -46,9 +46,26 @@ export async function guardarFichaCompleta(cliente, dados) {
   const ficha = {
     nome_cliente: cliente,
     referencia: dados.referencia || "",
-    descricao: dados.descricaoTecido || "",
-    valor: dados.precoComComissao || 0,
+    descricaoTecido: dados.descricaoTecido || "",
+
+    tecido1: dados.tecido1 || { consumo: "", preco: "" },
+    tecido2: dados.tecido2 || { consumo: "", preco: "" },
+
+    custoTecido1: dados.custoTecido1 || 0,
+    custoTecido2: dados.custoTecido2 || 0,
+    custoTotalTecidos: dados.custoTotalTecidos || 0,
+
+    totalExtras: dados.totalExtras || 0,
+    variaveis: dados.variaveis || {},
+
+    margem: dados.margem || 0,
+    precoFinal: dados.precoFinal || 0,
+    precoComMargem: dados.precoComMargem || 0,
+    comissao: dados.comissao || 0,
+    precoComComissao: dados.precoComComissao || 0,
+
     precocliente: dados.precoCliente || 0,
+
     user_id: user.id,
     atualizadoEm: new Date().toISOString(),
   };
@@ -63,7 +80,7 @@ export async function guardarFichaCompleta(cliente, dados) {
 }
 
 /* ============================================================
-   🗑️ APAGAR FICHA (SUPABASE)
+   🗑️ APAGAR FICHA
    ============================================================ */
 export async function apagarFicha(cliente) {
   await supabase
@@ -73,7 +90,7 @@ export async function apagarFicha(cliente) {
 }
 
 /* ============================================================
-   📄 DUPLICAR FICHA (SUPABASE)
+   📄 DUPLICAR FICHA
    ============================================================ */
 export async function duplicarFicha(cliente) {
   const ficha = await getFichaCliente(cliente);
