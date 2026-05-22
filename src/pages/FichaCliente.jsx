@@ -94,7 +94,7 @@ export default function FichaCliente() {
         </div>
       </div>
 
-  {/* BOTÕES — VERSÃO FINAL */}
+ {/* BOTÕES — VERSÃO FINAL */}
 <div className="ficha-botoes">
 
   {/* EDITAR */}
@@ -130,6 +130,7 @@ export default function FichaCliente() {
   </button>
 
 </div>
+
 
   );
 }
