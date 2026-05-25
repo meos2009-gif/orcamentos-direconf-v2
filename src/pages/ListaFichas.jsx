@@ -29,7 +29,6 @@ export default function ListaFichas() {
     carregar();
   }
 
-  // 🔍 FILTRO PREMIUM
   const fichasFiltradas = fichas.filter((f) => {
     const clienteOK = f.nome_cliente
       ?.toLowerCase()
@@ -46,7 +45,6 @@ export default function ListaFichas() {
     <div className="card-premium">
       <h2 className="titulo-premium">Fichas de Preço</h2>
 
-      {/* 🔍 CAMPOS DE PESQUISA */}
       <div style={{ display: "flex", gap: "12px", marginBottom: "20px" }}>
         <input
           className="input-premium"

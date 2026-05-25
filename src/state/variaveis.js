@@ -1,21 +1,30 @@
-// Guardar variáveis no localStorage
-export function getVariaveis() {
-  return JSON.parse(localStorage.getItem("variaveis") || "[]");
+import { supabase } from "../supabaseClient";
+
+export async function getVariaveis() {
+  const { data: auth } = await supabase.auth.getUser();
+  const user = auth?.user;
+  if (!user) return [];
+
+  const { data } = await supabase
+    .from("variaveis")
+    .select("*")
+    .eq("user_id", user.id)
+    .order("nome", { ascending: true });
+
+  return data || [];
 }
 
-export function adicionarVariavel(nome) {
-  const variaveis = getVariaveis();
+export async function guardarVariavel(nome) {
+  const { data: auth } = await supabase.auth.getUser();
+  const user = auth?.user;
+  if (!user) return;
 
-  const nova = {
-    id: Date.now(),
+  await supabase.from("variaveis").insert({
     nome,
-  };
-
-  variaveis.push(nova);
-  localStorage.setItem("variaveis", JSON.stringify(variaveis));
+    user_id: user.id,
+  });
 }
 
-export function apagarVariavel(id) {
-  const variaveis = getVariaveis().filter((v) => v.id !== id);
-  localStorage.setItem("variaveis", JSON.stringify(variaveis));
+export async function apagarVariavel(id) {
+  await supabase.from("variaveis").delete().eq("id", id);
 }
