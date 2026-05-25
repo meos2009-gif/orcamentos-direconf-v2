@@ -4,6 +4,9 @@ import { useNavigate } from "react-router-dom";
 
 export default function ListaFichas() {
   const [fichas, setFichas] = useState([]);
+  const [filtroCliente, setFiltroCliente] = useState("");
+  const [filtroReferencia, setFiltroReferencia] = useState("");
+
   const navigate = useNavigate();
 
   async function carregar() {
@@ -26,15 +29,47 @@ export default function ListaFichas() {
     carregar();
   }
 
+  // 🔍 FILTRO PREMIUM
+  const fichasFiltradas = fichas.filter((f) => {
+    const clienteOK = f.nome_cliente
+      ?.toLowerCase()
+      .includes(filtroCliente.toLowerCase());
+
+    const referenciaOK = f.referencia
+      ?.toLowerCase()
+      .includes(filtroReferencia.toLowerCase());
+
+    return clienteOK && referenciaOK;
+  });
+
   return (
     <div className="card-premium">
       <h2 className="titulo-premium">Fichas de Preço</h2>
 
-      {fichas.length === 0 && (
-        <p className="texto-vazio">Nenhuma ficha guardada.</p>
+      {/* 🔍 CAMPOS DE PESQUISA */}
+      <div style={{ display: "flex", gap: "12px", marginBottom: "20px" }}>
+        <input
+          className="input-premium"
+          placeholder="Pesquisar por cliente..."
+          value={filtroCliente}
+          onChange={(e) => setFiltroCliente(e.target.value)}
+          style={{ flex: 1 }}
+        />
+
+        <input
+          className="input-premium"
+          placeholder="Pesquisar por referência..."
+          value={filtroReferencia}
+          onChange={(e) => setFiltroReferencia(e.target.value)}
+          style={{ flex: 1 }}
+        />
+      </div>
+
+      {fichasFiltradas.length === 0 && (
+        <p className="texto-vazio">Nenhuma ficha encontrada.</p>
       )}
 
-      {fichas.length > 0 && (
+      {fichasFiltradas.length > 0 && (
         <table className="tabela-premium">
           <thead>
             <tr>
@@ -49,19 +84,18 @@ export default function ListaFichas() {
           </thead>
 
           <tbody>
-            {fichas.map((f) => (
+            {fichasFiltradas.map((f) => (
               <tr key={f.id}>
                 <td>{f.nome_cliente}</td>
                 <td>{f.referencia}</td>
 
-                <td>{(f.precofinal || 0).toFixed(2)} €</td>
-                <td>{(f.precocliente || 0).toFixed(2)} €</td>
+                <td>{(f.precofinal ?? 0).toFixed(2)} €</td>
+                <td>{(f.precocliente ?? 0).toFixed(2)} €</td>
 
                 <td>{f.margem}%</td>
                 <td>{f.comissao}%</td>
 
                 <td className="acoes-coluna">
-
                   <button
                     className="btn-acao"
                     onClick={() => navigate(`/formulario?id=${f.id}`)}
@@ -89,7 +123,6 @@ export default function ListaFichas() {
                   >
                     Apagar
                   </button>
-
                 </td>
               </tr>
             ))}
