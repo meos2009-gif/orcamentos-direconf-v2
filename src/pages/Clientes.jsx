@@ -1,115 +1,88 @@
 import { useEffect, useState } from "react";
-import { criarCliente, listarClientes, apagarCliente } from "../state/clientes";
+import { listarClientes, guardarCliente, apagarCliente } from "../state/clientes";
 
 export default function Clientes() {
   const [clientes, setClientes] = useState([]);
-  const [nome, setNome] = useState("");
-  const [telefone, setTelefone] = useState("");
-  const [email, setEmail] = useState("");
+  const [novoCliente, setNovoCliente] = useState("");
 
-  // 🔹 Carregar clientes do utilizador autenticado
   async function carregar() {
-    const { data, error } = await listarClientes();
-    if (!error) setClientes(data || []);
+    const { data } = await listarClientes();
+    setClientes(data || []);
   }
 
   useEffect(() => {
     carregar();
   }, []);
 
-  // 🔹 Criar cliente
-  async function guardar() {
-    if (!nome.trim()) return;
+  async function adicionar() {
+    if (!novoCliente.trim()) return;
 
-    const { error } = await criarCliente({ nome, telefone, email });
-
-    if (error) {
-      alert("Erro ao criar cliente");
-      return;
-    }
-
-    setNome("");
-    setTelefone("");
-    setEmail("");
-
+    await guardarCliente(novoCliente.trim());
+    setNovoCliente("");
     carregar();
   }
 
-  // 🔹 Apagar cliente
-  async function remover(id) {
-    if (!confirm("Apagar cliente?")) return;
-
-    const { error } = await apagarCliente(id);
-
-    if (!error) carregar();
+  async function apagar(id) {
+    if (!confirm("Apagar este cliente?")) return;
+    await apagarCliente(id);
+    carregar();
   }
 
   return (
-    <div className="card">
-      <h2>Clientes</h2>
+    <div className="card-premium">
+      <h2 className="titulo-premium">Clientes</h2>
 
-      {/* Formulário criar cliente */}
-      <div className="form-linha-top">
-        <div className="campo">
-          <label>Nome</label>
-          <input
-            type="text"
-            value={nome}
-            onChange={(e) => setNome(e.target.value)}
-          />
-        </div>
+      {/* ADICIONAR CLIENTE */}
+      <div className="form-card" style={{ marginBottom: "20px" }}>
+        <label>Novo cliente</label>
+        <input
+          className="input-premium"
+          value={novoCliente}
+          onChange={(e) => setNovoCliente(e.target.value)}
+          placeholder="Nome do cliente..."
+        />
 
-        <div className="campo">
-          <label>Telefone</label>
-          <input
-            type="text"
-            value={telefone}
-            onChange={(e) => setTelefone(e.target.value)}
-          />
-        </div>
-
-        <div className="campo">
-          <label>Email</label>
-          <input
-            type="text"
-            value={email}
-            onChange={(e) => setEmail(e.target.value)}
-          />
-        </div>
-
-        <button className="btn-primary" onClick={guardar}>
-          Guardar Cliente
+        <button className="btn-acao" onClick={adicionar} style={{ marginTop: "10px" }}>
+          Adicionar
         </button>
       </div>
 
-      <hr style={{ margin: "20px 0", borderColor: "#334155" }} />
+      {/* LISTA DE CLIENTES */}
+      <div className="form-card">
+        <h3>Clientes registados</h3>
 
-      {/* Lista de clientes */}
-      <h3>Lista de Clientes</h3>
+        {clientes.length === 0 && (
+          <p className="texto-vazio">Nenhum cliente registado.</p>
+        )}
 
-      {clientes.length === 0 && <p>Nenhum cliente encontrado.</p>}
+        {clientes.length > 0 && (
+          <table className="tabela-premium">
+            <thead>
+              <tr>
+                <th>Nome</th>
+                <th>Ações</th>
+              </tr>
+            </thead>
 
-      <ul style={{ marginTop: "10px", paddingLeft: "20px" }}>
-        {clientes.map((c) => (
-          <li key={c.id} style={{ marginBottom: "8px" }}>
-            <b>{c.nome}</b> — {c.telefone} — {c.email}
-            <button
-              style={{
-                marginLeft: "10px",
-                background: "#ef4444",
-                color: "white",
-                border: "none",
-                padding: "4px 8px",
-                borderRadius: "4px",
-                cursor: "pointer",
-              }}
-              onClick={() => remover(c.id)}
-            >
-              Apagar
-            </button>
-          </li>
-        ))}
-      </ul>
+            <tbody>
+              {clientes.map((c) => (
+                <tr key={c.id}>
+                  <td>{c.nome}</td>
+
+                  <td>
+                    <button
+                      className="btn-apagar"
+                      onClick={() => apagar(c.id)}
+                    >
+                      Apagar
+                    </button>
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        )}
+      </div>
     </div>
   );
 }
