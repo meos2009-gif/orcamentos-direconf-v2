@@ -11,7 +11,7 @@ export default function ListaFichas() {
 
   async function carregar() {
     const lista = await getTodasFichas();
-    setFichas(lista);
+    setFichas(lista || []);
   }
 
   useEffect(() => {
@@ -30,12 +30,12 @@ export default function ListaFichas() {
   }
 
   const fichasFiltradas = fichas.filter((f) => {
-    const clienteOK = f.nome_cliente
-      ?.toLowerCase()
+    const clienteOK = (f.nome_cliente || "")
+      .toLowerCase()
       .includes(filtroCliente.toLowerCase());
 
-    const referenciaOK = f.referencia
-      ?.toLowerCase()
+    const referenciaOK = (f.referencia || "")
+      .toLowerCase()
       .includes(filtroReferencia.toLowerCase());
 
     return clienteOK && referenciaOK;
@@ -51,7 +51,6 @@ export default function ListaFichas() {
           placeholder="Pesquisar por cliente..."
           value={filtroCliente}
           onChange={(e) => setFiltroCliente(e.target.value)}
-          style={{ flex: 1 }}
         />
 
         <input
@@ -59,7 +58,6 @@ export default function ListaFichas() {
           placeholder="Pesquisar por referência..."
           value={filtroReferencia}
           onChange={(e) => setFiltroReferencia(e.target.value)}
-          style={{ flex: 1 }}
         />
       </div>
 

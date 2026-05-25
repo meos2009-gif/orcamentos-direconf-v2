@@ -27,9 +27,13 @@ export default function FormularioPreco() {
 
   const [precoCliente, setPrecoCliente] = useState("");
 
-  // Carregar variáveis
+  // Carregar variáveis (CORRIGIDO)
   useEffect(() => {
-    setVariaveis(getVariaveis());
+    async function carregar() {
+      const lista = await getVariaveis();
+      setVariaveis(lista || []);
+    }
+    carregar();
   }, []);
 
   // Carregar clientes
@@ -41,7 +45,7 @@ export default function FormularioPreco() {
     carregar();
   }, []);
 
-  // Carregar ficha para edição ou duplicação
+  // Carregar ficha para edição ou duplicação (CORRIGIDO)
   useEffect(() => {
     async function carregarFicha() {
       if (!idFicha && !duplicarId) return;
@@ -52,18 +56,31 @@ export default function FormularioPreco() {
       setCliente(
         duplicarId ? ficha.nome_cliente + " (cópia)" : ficha.nome_cliente
       );
-      setReferencia(ficha.referencia);
-      setDescricaoTecido(ficha.descricaotecido);
+      setReferencia(ficha.referencia || "");
+      setDescricaoTecido(ficha.descricaotecido || "");
 
-      setTecido1(ficha.tecido1 || {});
-      setTecido2(ficha.tecido2 || {});
+      setTecido1(
+        typeof ficha.tecido1 === "object" && ficha.tecido1 !== null
+          ? ficha.tecido1
+          : { consumo: "", preco: "" }
+      );
 
-      setExtrasDinamicos(ficha.variaveis || {});
+      setTecido2(
+        typeof ficha.tecido2 === "object" && ficha.tecido2 !== null
+          ? ficha.tecido2
+          : { consumo: "", preco: "" }
+      );
 
-      setMargem(ficha.margem);
-      setComissao(ficha.comissao);
+      setExtrasDinamicos(
+        typeof ficha.variaveis === "object" && ficha.variaveis !== null
+          ? ficha.variaveis
+          : {}
+      );
 
-      setPrecoCliente(ficha.precocliente);
+      setMargem(ficha.margem || "");
+      setComissao(ficha.comissao || "");
+
+      setPrecoCliente(ficha.precocliente || "");
     }
 
     carregarFicha();
@@ -90,7 +107,7 @@ export default function FormularioPreco() {
   const comissaoNum = parseFloat(comissao || 0);
   const precoComComissao = precoComMargem * (1 + comissaoNum / 100);
 
-  // Guardar ficha
+  // Guardar ficha (VALIDADO COM A TABELA)
   async function guardar() {
     if (!cliente.trim()) return;
 
@@ -170,7 +187,7 @@ export default function FormularioPreco() {
           <h3>Custos Variáveis</h3>
 
           {variaveis.map((v) => (
-            <div key={v.nome} className="linha-variavel">
+            <div key={v.id} className="linha-variavel">
               <span>{v.nome}</span>
               <input
                 type="number"

@@ -1,60 +1,74 @@
-// src/state/precos.js
+import { supabase } from "../supabaseClient";
 
-// 🔹 Obter todas as fichas guardadas
-export function getTodasFichas() {
-  return JSON.parse(localStorage.getItem("fichas") || "[]");
+const TABELA = "fichas_preco";
+
+export async function getTodasFichas() {
+  const { data: auth } = await supabase.auth.getUser();
+  const user = auth?.user;
+  if (!user) return [];
+
+  const { data } = await supabase
+    .from(TABELA)
+    .select("*")
+    .eq("user_id", user.id)
+    .order("created_at", { ascending: false });
+
+  return data || [];
 }
 
-// 🔹 Guardar lista completa
-function guardarFichas(lista) {
-  localStorage.setItem("fichas", JSON.stringify(lista));
+export async function getFichaPorId(id) {
+  const { data } = await supabase
+    .from(TABELA)
+    .select("*")
+    .eq("id", id)
+    .single();
+
+  return data;
 }
 
-// 🔹 Obter ficha por ID
-export function getFichaPorId(id) {
-  const fichas = getTodasFichas();
-  return fichas.find(f => f.id == id); // == para aceitar string ou número
-}
+export async function guardarFicha(ficha) {
+  const { data: auth } = await supabase.auth.getUser();
+  const user = auth?.user;
+  if (!user) return;
 
-// 🔹 Apagar ficha
-export function apagarFicha(id) {
-  const fichas = getTodasFichas();
-  const novas = fichas.filter(f => f.id != id);
-  guardarFichas(novas);
-}
-
-// 🔹 Duplicar ficha
-export function duplicarFicha(id) {
-  const fichas = getTodasFichas();
-  const original = fichas.find(f => f.id == id);
-  if (!original) return;
-
-  const copia = {
-    ...original,
-    id: Date.now(), // novo ID
-    referencia: original.referencia + "_COPIA"
+  const fichaFinal = {
+    ...ficha,
+    user_id: user.id,
+    atualizadoem: new Date().toISOString(),
   };
 
-  fichas.push(copia);
-  guardarFichas(fichas);
+  if (ficha.id) {
+    await supabase.from(TABELA).update(fichaFinal).eq("id", ficha.id);
+  } else {
+    await supabase.from(TABELA).insert(fichaFinal);
+  }
 }
 
-// 🔹 Criar ou atualizar ficha
-export function guardarFicha(ficha) {
-  const fichas = getTodasFichas();
+export async function apagarFicha(id) {
+  await supabase.from(TABELA).delete().eq("id", id);
+}
 
-  // Atualizar ficha existente
-  if (ficha.id) {
-    const index = fichas.findIndex(f => f.id == ficha.id);
-    if (index !== -1) {
-      fichas[index] = ficha;
-      guardarFichas(fichas);
-      return;
-    }
-  }
+export async function duplicarFicha(id) {
+  const { data: auth } = await supabase.auth.getUser();
+  const user = auth?.user;
 
-  // Criar nova ficha
-  ficha.id = Date.now();
-  fichas.push(ficha);
-  guardarFichas(fichas);
+  const { data } = await supabase
+    .from(TABELA)
+    .select("*")
+    .eq("id", id)
+    .single();
+
+  if (!data) return;
+
+  const copia = {
+    ...data,
+    id: undefined,
+    referencia: data.referencia + "_COPIA",
+    nome_cliente: data.nome_cliente + " (cópia)",
+    user_id: user.id,
+    created_at: new Date().toISOString(),
+    atualizadoem: new Date().toISOString(),
+  };
+
+  await supabase.from(TABELA).insert(copia);
 }
