@@ -112,24 +112,24 @@ export default function FormularioPreco() {
     if (!cliente.trim()) return;
 
     await guardarFicha({
-      id: idFicha || undefined,
-      nome_cliente: cliente.trim(),
-      referencia,
-      descricaotecido: descricaoTecido,
-      tecido1,
-      tecido2,
-      custotecido1: custoTecido1,
-      custotecido2: custoTecido2,
-      custototaltecidos: custoTotalTecidos,
-      totalextras: totalExtras,
-      variaveis: extrasDinamicos,
-      margem: margemNum,
-      precoFinal,
-      precocommargem: precoComMargem,
-      comissao: comissaoNum,
-      precocomcomissao: precoComComissao,
-      precocliente: parseFloat(precoCliente || 0),
-    });
+  id: idFicha || undefined,
+  nome_cliente: cliente.trim(),
+  referencia,
+  descricaotecido: descricaoTecido,
+  tecido1,
+  tecido2,
+  custotecido1: custoTecido1,
+  custotecido2: custoTecido2,
+  custototaltecidos: custoTotalTecidos,
+  totalextras: totalExtras,
+  variaveis: extrasDinamicos,
+  margem: margemNum,
+  precofinal: precoFinal,            // <-- CORRIGIDO
+  precocommargem: precoComMargem,
+  comissao: comissaoNum,
+  precocomcomissao: precoComComissao,
+  precocliente: parseFloat(precoCliente || 0),
+});
 
     alert("Ficha guardada!");
   }
