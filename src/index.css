@@ -560,5 +560,51 @@ body {
 .btn-apagar:hover {
   background: #b91c1c;
 }
+.ficha-premium-container {
+  display: flex;
+  flex-direction: column;
+  gap: 25px;
+}
+
+.titulo-premium-grande {
+  font-size: 32px;
+  font-weight: 700;
+  margin-bottom: 10px;
+  color: #fff;
+}
+
+.ficha-card {
+  background: #0f172a;
+  padding: 20px;
+  border-radius: 12px;
+  border: 1px solid #1e293b;
+  box-shadow: 0 0 10px rgba(0,0,0,0.3);
+}
+
+.ficha-sec-titulo {
+  font-size: 20px;
+  margin-bottom: 12px;
+  color: #38bdf8;
+}
+
+.ficha-linha {
+  display: flex;
+  justify-content: space-between;
+  padding: 6px 0;
+  border-bottom: 1px solid #1e293b;
+}
+
+.ficha-linha:last-child {
+  border-bottom: none;
+}
+
+.destaque-premium {
+  background: #1e293b;
+  padding: 10px;
+  border-radius: 8px;
+  margin-top: 10px;
+  font-size: 18px;
+  color: #38f8a0;
+}
 
 
