@@ -86,26 +86,28 @@ export default function FormularioPreco() {
     carregarFicha();
   }, [idFicha, duplicarId]);
 
-  // Cálculos
-  const custoTecido1 =
-    (parseFloat(tecido1.consumo || 0) * parseFloat(tecido1.preco || 0)) || 0;
+  // Cálculos com arredondamento
+  const arred = (n) => Number(parseFloat(n || 0).toFixed(2));
 
-  const custoTecido2 =
-    (parseFloat(tecido2.consumo || 0) * parseFloat(tecido2.preco || 0)) || 0;
+  const custoTecido1 = arred(tecido1.consumo * tecido1.preco);
+  const custoTecido2 = arred(tecido2.consumo * tecido2.preco);
 
-  const custoTotalTecidos = custoTecido1 + custoTecido2;
+  const custoTotalTecidos = arred(custoTecido1 + custoTecido2);
 
-  const totalExtras = Object.values(extrasDinamicos).reduce(
-    (acc, v) => acc + (parseFloat(v) || 0),
-    0
+  const totalExtras = arred(
+    Object.values(extrasDinamicos).reduce(
+      (acc, v) => acc + (parseFloat(v) || 0),
+      0
+    )
   );
 
   const margemNum = parseFloat(margem || 0);
-  const precoDeCusto = custoTotalTecidos + totalExtras; // antigo precoFinal
-  const precoComMargem = precoDeCusto * (1 + margemNum / 100);
+  const precoDeCusto = arred(custoTotalTecidos + totalExtras);
+
+  const precoComMargem = arred(precoDeCusto * (1 + margemNum / 100));
 
   const comissaoNum = parseFloat(comissao || 0);
-  const precoFinal = precoComMargem * (1 + comissaoNum / 100); // antigo precoComComissao
+  const precoFinal = arred(precoComMargem * (1 + comissaoNum / 100));
 
   // Guardar ficha
   async function guardar() {
@@ -124,11 +126,11 @@ export default function FormularioPreco() {
       totalextras: totalExtras,
       variaveis: extrasDinamicos,
       margem: margemNum,
-      precofinal: precoDeCusto, // <-- PREÇO DE CUSTO
+      precofinal: precoDeCusto,          // PREÇO DE CUSTO
       precocommargem: precoComMargem,
       comissao: comissaoNum,
-      precocomcomissao: precoFinal, // <-- PREÇO FINAL
-      precocliente: parseFloat(precoCliente || 0),
+      precocomcomissao: precoFinal,      // PREÇO FINAL
+      precocliente: arred(precoCliente),
     });
 
     alert("Ficha guardada!");
@@ -231,7 +233,7 @@ export default function FormularioPreco() {
           />
 
           <div className="resultado-premium">
-            Custo Tecido 1: <b>{custoTecido1.toFixed(2)} €</b>
+            Custo Tecido 1: <b>{custoTecido1} €</b>
           </div>
         </div>
 
@@ -257,15 +259,15 @@ export default function FormularioPreco() {
           />
 
           <div className="resultado-premium">
-            Custo Tecido 2: <b>{custoTecido2.toFixed(2)} €</b>
+            Custo Tecido 2: <b>{custoTecido2} €</b>
           </div>
         </div>
 
         <div className="form-card">
           <h3>Totais</h3>
 
-          <p>Preço de Custo: <b>{precoDeCusto.toFixed(2)} €</b></p>
-          <p>Preço com Margem: <b>{precoComMargem.toFixed(2)} €</b></p>
+          <p>Preço de Custo: <b>{precoDeCusto} €</b></p>
+          <p>Preço com Margem: <b>{precoComMargem} €</b></p>
 
           <label>Margem (%)</label>
           <input
@@ -281,7 +283,7 @@ export default function FormularioPreco() {
             onChange={(e) => setComissao(e.target.value)}
           />
 
-          <p>Preço Final: <b>{precoFinal.toFixed(2)} €</b></p>
+          <p>Preço Final: <b>{precoFinal} €</b></p>
 
           <button className="btn-guardar" onClick={guardar}>
             Guardar Ficha
