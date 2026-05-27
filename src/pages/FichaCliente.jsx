@@ -6,6 +6,8 @@ export default function FichaCliente() {
   const { id } = useParams();
   const [ficha, setFicha] = useState(null);
 
+  const arred = (n) => Number(parseFloat(n || 0).toFixed(2));
+
   useEffect(() => {
     async function carregar() {
       const f = await getFichaPorId(id);
@@ -39,12 +41,16 @@ export default function FichaCliente() {
 
         <div className="ficha-linha">
           <b>Tecido 1:</b>
-          <span>Consumo {ficha.tecido1?.consumo} | Preço {ficha.tecido1?.preco}</span>
+          <span>
+            Consumo {arred(ficha.tecido1?.consumo)} | Preço {arred(ficha.tecido1?.preco)} €
+          </span>
         </div>
 
         <div className="ficha-linha">
           <b>Tecido 2:</b>
-          <span>Consumo {ficha.tecido2?.consumo} | Preço {ficha.tecido2?.preco}</span>
+          <span>
+            Consumo {arred(ficha.tecido2?.consumo)} | Preço {arred(ficha.tecido2?.preco)} €
+          </span>
         </div>
       </div>
 
@@ -59,7 +65,7 @@ export default function FichaCliente() {
         {Object.entries(extras).map(([nome, valor]) => (
           <div key={nome} className="ficha-linha">
             <b>{nome}:</b>
-            <span>{valor} €</span>
+            <span>{arred(valor)} €</span>
           </div>
         ))}
       </div>
@@ -70,32 +76,37 @@ export default function FichaCliente() {
 
         <div className="ficha-linha">
           <b>Custo Total Tecidos:</b>
-          <span>{ficha.custototaltecidos} €</span>
+          <span>{arred(ficha.custototaltecidos)} €</span>
         </div>
 
         <div className="ficha-linha">
           <b>Total Extras:</b>
-          <span>{ficha.totalextras} €</span>
+          <span>{arred(ficha.totalextras)} €</span>
         </div>
 
         <div className="ficha-linha">
           <b>Margem:</b>
-          <span>{ficha.margem}%</span>
+          <span>{arred(ficha.margem)}%</span>
         </div>
 
         <div className="ficha-linha">
           <b>Comissão:</b>
-          <span>{ficha.comissao}%</span>
+          <span>{arred(ficha.comissao)}%</span>
+        </div>
+
+        <div className="ficha-linha destaque-premium">
+          <b>Preço de Custo:</b>
+          <span>{arred(ficha.precofinal)} €</span>
         </div>
 
         <div className="ficha-linha destaque-premium">
           <b>Preço Final:</b>
-          <span>{ficha.precofinal} €</span>
+          <span>{arred(ficha.precocomcomissao)} €</span>
         </div>
 
         <div className="ficha-linha destaque-premium">
           <b>Preço Cliente:</b>
-          <span>{ficha.precocliente} €</span>
+          <span>{arred(ficha.precocliente)} €</span>
         </div>
       </div>
 
