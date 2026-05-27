@@ -27,7 +27,7 @@ export default function FormularioPreco() {
 
   const [precoCliente, setPrecoCliente] = useState("");
 
-  // Carregar variáveis (CORRIGIDO)
+  // Carregar variáveis
   useEffect(() => {
     async function carregar() {
       const lista = await getVariaveis();
@@ -45,7 +45,7 @@ export default function FormularioPreco() {
     carregar();
   }, []);
 
-  // Carregar ficha para edição ou duplicação (CORRIGIDO)
+  // Carregar ficha para edição ou duplicação
   useEffect(() => {
     async function carregarFicha() {
       if (!idFicha && !duplicarId) return;
@@ -101,35 +101,35 @@ export default function FormularioPreco() {
   );
 
   const margemNum = parseFloat(margem || 0);
-  const precoFinal = custoTotalTecidos + totalExtras;
-  const precoComMargem = precoFinal * (1 + margemNum / 100);
+  const precoDeCusto = custoTotalTecidos + totalExtras; // antigo precoFinal
+  const precoComMargem = precoDeCusto * (1 + margemNum / 100);
 
   const comissaoNum = parseFloat(comissao || 0);
-  const precoComComissao = precoComMargem * (1 + comissaoNum / 100);
+  const precoFinal = precoComMargem * (1 + comissaoNum / 100); // antigo precoComComissao
 
-  // Guardar ficha (VALIDADO COM A TABELA)
+  // Guardar ficha
   async function guardar() {
     if (!cliente.trim()) return;
 
     await guardarFicha({
-  id: idFicha || undefined,
-  nome_cliente: cliente.trim(),
-  referencia,
-  descricaotecido: descricaoTecido,
-  tecido1,
-  tecido2,
-  custotecido1: custoTecido1,
-  custotecido2: custoTecido2,
-  custototaltecidos: custoTotalTecidos,
-  totalextras: totalExtras,
-  variaveis: extrasDinamicos,
-  margem: margemNum,
-  precofinal: precoFinal,            // <-- CORRIGIDO
-  precocommargem: precoComMargem,
-  comissao: comissaoNum,
-  precocomcomissao: precoComComissao,
-  precocliente: parseFloat(precoCliente || 0),
-});
+      id: idFicha || undefined,
+      nome_cliente: cliente.trim(),
+      referencia,
+      descricaotecido: descricaoTecido,
+      tecido1,
+      tecido2,
+      custotecido1: custoTecido1,
+      custotecido2: custoTecido2,
+      custototaltecidos: custoTotalTecidos,
+      totalextras: totalExtras,
+      variaveis: extrasDinamicos,
+      margem: margemNum,
+      precofinal: precoDeCusto, // <-- PREÇO DE CUSTO
+      precocommargem: precoComMargem,
+      comissao: comissaoNum,
+      precocomcomissao: precoFinal, // <-- PREÇO FINAL
+      precocliente: parseFloat(precoCliente || 0),
+    });
 
     alert("Ficha guardada!");
   }
@@ -264,8 +264,8 @@ export default function FormularioPreco() {
         <div className="form-card">
           <h3>Totais</h3>
 
-          <p>Custo Total Tecidos: <b>{custoTotalTecidos.toFixed(2)} €</b></p>
-          <p>Total Extras: <b>{totalExtras.toFixed(2)} €</b></p>
+          <p>Preço de Custo: <b>{precoDeCusto.toFixed(2)} €</b></p>
+          <p>Preço com Margem: <b>{precoComMargem.toFixed(2)} €</b></p>
 
           <label>Margem (%)</label>
           <input
@@ -282,8 +282,6 @@ export default function FormularioPreco() {
           />
 
           <p>Preço Final: <b>{precoFinal.toFixed(2)} €</b></p>
-          <p>Preço com Margem: <b>{precoComMargem.toFixed(2)} €</b></p>
-          <p>Preço com Comissão: <b>{precoComComissao.toFixed(2)} €</b></p>
 
           <button className="btn-guardar" onClick={guardar}>
             Guardar Ficha
