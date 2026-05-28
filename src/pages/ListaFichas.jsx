@@ -9,6 +9,8 @@ export default function ListaFichas() {
 
   const navigate = useNavigate();
 
+  const arred = (n) => Number(parseFloat(n || 0).toFixed(2));
+
   async function carregar() {
     const lista = await getTodasFichas();
     setFichas(lista || []);
@@ -43,8 +45,10 @@ export default function ListaFichas() {
 
   return (
     <div className="card-premium">
+
       <h2 className="titulo-premium">Fichas de Preço</h2>
 
+      {/* FILTROS */}
       <div style={{ display: "flex", gap: "12px", marginBottom: "20px" }}>
         <input
           className="input-premium"
@@ -85,11 +89,13 @@ export default function ListaFichas() {
                 <td>{f.nome_cliente}</td>
                 <td>{f.referencia}</td>
 
-                <td>{(f.precofinal ?? 0).toFixed(2)} €</td>
-                <td>{(f.precocliente ?? 0).toFixed(2)} €</td>
+                {/* PREÇO FINAL = precocomcomissao */}
+                <td>{arred(f.precocomcomissao)} €</td>
 
-                <td>{f.margem}%</td>
-                <td>{f.comissao}%</td>
+                <td>{arred(f.precocliente)} €</td>
+
+                <td>{arred(f.margem)}%</td>
+                <td>{arred(f.comissao)}%</td>
 
                 <td className="acoes-coluna">
                   <button
