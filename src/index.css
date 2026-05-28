@@ -716,5 +716,112 @@ body {
     flex-direction: column;
   }
 }
+/* LAYOUT GERAL MAIS COMPACTO */
+.form-premium-layout {
+  display: flex;
+  gap: 18px;
+  padding: 10px;
+  color: #fff;
+}
+
+/* COLUNAS MAIS ESTREITAS */
+.form-col-esquerda,
+.form-col-direita {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+}
+
+/* CARTÕES MAIS BAIXOS */
+.form-card {
+  background: #0f172a;
+  padding: 14px;
+  border-radius: 10px;
+  border: 1px solid #1e293b;
+}
+
+.form-card h3 {
+  margin-bottom: 8px;
+  font-size: 17px;
+  color: #38bdf8;
+}
+
+/* INPUTS COMPACTOS */
+.input-premium {
+  width: 100%;
+  padding: 6px 10px;
+  margin-top: 4px;
+  margin-bottom: 8px;
+  background: #1e293b;
+  border: 1px solid #334155;
+  border-radius: 8px;
+  color: #fff;
+  font-size: 14px;
+}
+
+/* INPUTS NUMÉRICOS PEQUENOS */
+.input-num {
+  width: 90px;
+  padding: 6px 8px;
+  margin-left: auto;
+  text-align: right;
+}
+
+/* LINHAS DE VARIÁVEIS MAIS COMPACTAS */
+.linha-variavel {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 6px;
+}
+
+.linha-variavel span {
+  font-size: 14px;
+}
+
+/* RESULTADOS COMPACTOS */
+.resultado-premium {
+  margin-top: 6px;
+  padding: 6px;
+  background: #1e293b;
+  border-radius: 8px;
+  font-size: 14px;
+  color: #38f8a0;
+}
+
+/* BOTÃO GUARDAR MAIS PEQUENO */
+.btn-guardar {
+  width: 100%;
+  padding: 10px;
+  margin-top: 12px;
+  background: #38bdf8;
+  border: none;
+  border-radius: 8px;
+  color: #0f172a;
+  font-size: 15px;
+  font-weight: bold;
+  cursor: pointer;
+}
+
+.btn-guardar:hover {
+  background: #0ea5e9;
+}
+
+/* TOTAIS MAIS COMPACTOS */
+.form-card p {
+  margin: 4px 0;
+  font-size: 14px;
+}
+
+.form-card p b {
+  color: #38f8a0;
+}
+
+/* DESTAQUE FINAL */
+.form-card p:last-child b {
+  color: #facc15;
+  font-size: 16px;
+}
 
 

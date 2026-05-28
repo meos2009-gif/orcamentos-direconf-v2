@@ -27,11 +27,12 @@ export default function FormularioPreco() {
 
   const [precoCliente, setPrecoCliente] = useState("");
 
-  // Função de arredondamento segura
+  // Arredondamento seguro
   const arred = (n) => {
     const v = parseFloat(n);
-    if (isNaN(v)) return 0;
-    return Number(v.toFixed(2));
+    if (!isFinite(v)) return 0;
+    const r = Number(v.toFixed(2));
+    return Object.is(r, -0) ? 0 : r;
   };
 
   // Carregar variáveis
@@ -52,7 +53,7 @@ export default function FormularioPreco() {
     carregar();
   }, []);
 
-  // Carregar ficha para edição ou duplicação
+  // Carregar ficha
   useEffect(() => {
     async function carregarFicha() {
       if (!idFicha && !duplicarId) return;
@@ -66,23 +67,10 @@ export default function FormularioPreco() {
       setReferencia(ficha.referencia || "");
       setDescricaoTecido(ficha.descricaotecido || "");
 
-      setTecido1(
-        typeof ficha.tecido1 === "object" && ficha.tecido1 !== null
-          ? ficha.tecido1
-          : { consumo: "", preco: "" }
-      );
+      setTecido1(ficha.tecido1 || { consumo: "", preco: "" });
+      setTecido2(ficha.tecido2 || { consumo: "", preco: "" });
 
-      setTecido2(
-        typeof ficha.tecido2 === "object" && ficha.tecido2 !== null
-          ? ficha.tecido2
-          : { consumo: "", preco: "" }
-      );
-
-      setExtrasDinamicos(
-        typeof ficha.variaveis === "object" && ficha.variaveis !== null
-          ? ficha.variaveis
-          : {}
-      );
+      setExtrasDinamicos(ficha.variaveis || {});
 
       setMargem(ficha.margem || "");
       setComissao(ficha.comissao || "");
@@ -94,24 +82,30 @@ export default function FormularioPreco() {
   }, [idFicha, duplicarId]);
 
   // Cálculos seguros
-  const custoTecido1 = arred(tecido1.consumo * tecido1.preco);
-  const custoTecido2 = arred(tecido2.consumo * tecido2.preco);
+  const consumo1 = parseFloat(tecido1.consumo) || 0;
+  const preco1 = parseFloat(tecido1.preco) || 0;
+
+  const consumo2 = parseFloat(tecido2.consumo) || 0;
+  const preco2 = parseFloat(tecido2.preco) || 0;
+
+  const custoTecido1 = arred(consumo1 * preco1);
+  const custoTecido2 = arred(consumo2 * preco2);
 
   const custoTotalTecidos = arred(custoTecido1 + custoTecido2);
 
   const totalExtras = arred(
     Object.values(extrasDinamicos).reduce((acc, v) => {
       const num = parseFloat(v);
-      return acc + (isNaN(num) ? 0 : num);
+      return acc + (isFinite(num) ? num : 0);
     }, 0)
   );
 
-  const margemNum = parseFloat(margem || 0);
+  const margemNum = parseFloat(margem) || 0;
   const precoDeCusto = arred(custoTotalTecidos + totalExtras);
 
   const precoComMargem = arred(precoDeCusto * (1 + margemNum / 100));
 
-  const comissaoNum = parseFloat(comissao || 0);
+  const comissaoNum = parseFloat(comissao) || 0;
   const precoFinal = arred(precoComMargem * (1 + comissaoNum / 100));
 
   // Guardar ficha
@@ -183,7 +177,7 @@ export default function FormularioPreco() {
 
           <label>Preço Cliente</label>
           <input
-            className="input-premium"
+            className="input-premium input-num"
             type="number"
             value={precoCliente}
             onChange={(e) => setPrecoCliente(e.target.value)}
@@ -198,7 +192,7 @@ export default function FormularioPreco() {
               <span>{v.nome}</span>
               <input
                 type="number"
-                className="input-premium"
+                className="input-premium input-num"
                 value={extrasDinamicos[v.nome] || ""}
                 onChange={(e) =>
                   setExtrasDinamicos({
@@ -216,79 +210,94 @@ export default function FormularioPreco() {
       {/* COLUNA DIREITA */}
       <div className="form-col-direita">
 
+        {/* TECIDO 1 */}
         <div className="form-card">
           <h3>Tecido 1</h3>
 
-          <label>Consumo</label>
-          <input
-            className="input-premium"
-            value={tecido1.consumo}
-            onChange={(e) =>
-              setTecido1({ ...tecido1, consumo: e.target.value })
-            }
-          />
+          <div style={{ display: "flex", gap: "10px" }}>
+            <div style={{ flex: 1 }}>
+              <label>Consumo</label>
+              <input
+                className="input-premium input-num"
+                value={tecido1.consumo}
+                onChange={(e) =>
+                  setTecido1({ ...tecido1, consumo: e.target.value })
+                }
+              />
+            </div>
 
-          <label>Preço / unidade</label>
-          <input
-            className="input-premium"
-            value={tecido1.preco}
-            onChange={(e) =>
-              setTecido1({ ...tecido1, preco: e.target.value })
-            }
-          />
+            <div style={{ flex: 1 }}>
+              <label>Preço</label>
+              <input
+                className="input-premium input-num"
+                value={tecido1.preco}
+                onChange={(e) =>
+                  setTecido1({ ...tecido1, preco: e.target.value })
+                }
+              />
+            </div>
+          </div>
 
           <div className="resultado-premium">
             Custo Tecido 1: <b>{custoTecido1} €</b>
           </div>
         </div>
 
+        {/* TECIDO 2 */}
         <div className="form-card">
           <h3>Tecido 2</h3>
 
-          <label>Consumo</label>
-          <input
-            className="input-premium"
-            value={tecido2.consumo}
-            onChange={(e) =>
-              setTecido2({ ...tecido2, consumo: e.target.value })
-            }
-          />
+          <div style={{ display: "flex", gap: "10px" }}>
+            <div style={{ flex: 1 }}>
+              <label>Consumo</label>
+              <input
+                className="input-premium input-num"
+                value={tecido2.consumo}
+                onChange={(e) =>
+                  setTecido2({ ...tecido2, consumo: e.target.value })
+                }
+              />
+            </div>
 
-          <label>Preço / unidade</label>
-          <input
-            className="input-premium"
-            value={tecido2.preco}
-            onChange={(e) =>
-              setTecido2({ ...tecido2, preco: e.target.value })
-            }
-          />
+            <div style={{ flex: 1 }}>
+              <label>Preço</label>
+              <input
+                className="input-premium input-num"
+                value={tecido2.preco}
+                onChange={(e) =>
+                  setTecido2({ ...tecido2, preco: e.target.value })
+                }
+              />
+            </div>
+          </div>
 
           <div className="resultado-premium">
             Custo Tecido 2: <b>{custoTecido2} €</b>
           </div>
         </div>
 
+        {/* TOTAIS */}
         <div className="form-card">
           <h3>Totais</h3>
 
-          <p>Preço de Custo: <b>{precoDeCusto} €</b></p>
-          <p>Preço com Margem: <b>{precoComMargem} €</b></p>
+          <p><b>Preço de Custo:</b> {precoDeCusto} €</p>
+          <p><b>Preço com Margem:</b> {precoComMargem} €</p>
 
           <label>Margem (%)</label>
           <input
-            className="input-premium"
+            className="input-premium input-num"
             value={margem}
             onChange={(e) => setMargem(e.target.value)}
           />
 
           <label>Comissão (%)</label>
           <input
-            className="input-premium"
+            className="input-premium input-num"
             value={comissao}
             onChange={(e) => setComissao(e.target.value)}
           />
 
-          <p>Preço Final: <b>{precoFinal} €</b></p>
+          <p><b>Preço Final:</b> {precoFinal} €</p>
 
           <button className="btn-guardar" onClick={guardar}>
             Guardar Ficha
