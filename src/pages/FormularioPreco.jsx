@@ -125,10 +125,10 @@ export default function FormularioPreco() {
       totalextras: totalExtras,
       variaveis: extrasDinamicos,
       margem: margemNum,
-      precofinal: precoDeCusto,          // PREÇO DE CUSTO
+      precofinal: precoDeCusto,
       precocommargem: precoComMargem,
       comissao: comissaoNum,
-      precocomcomissao: precoFinal,      // PREÇO FINAL
+      precocomcomissao: precoFinal,
       precocliente: arred(precoCliente),
     });
 
@@ -206,31 +206,66 @@ export default function FormularioPreco() {
                     }
                   />
 
+                  {/* -1 */}
                   <button
                     className="btn-inc"
                     onClick={() => {
                       const atual = parseFloat(extrasDinamicos[v.nome]) || 0;
+                      const novo = Math.max(0, atual - 1);
                       setExtrasDinamicos({
                         ...extrasDinamicos,
-                        [v.nome]: (atual + 0.10).toFixed(2),
+                        [v.nome]: novo.toFixed(2),
+                      });
+                    }}
+                  >
+                    -1
+                  </button>
+
+                  {/* -0.10 */}
+                  <button
+                    className="btn-inc"
+                    onClick={() => {
+                      const atual = parseFloat(extrasDinamicos[v.nome]) || 0;
+                      const novo = Math.max(0, atual - 0.10);
+                      setExtrasDinamicos({
+                        ...extrasDinamicos,
+                        [v.nome]: novo.toFixed(2),
+                      });
+                    }}
+                  >
+                    -0.10
+                  </button>
+
+                  {/* +0.10 */}
+                  <button
+                    className="btn-inc"
+                    onClick={() => {
+                      const atual = parseFloat(extrasDinamicos[v.nome]) || 0;
+                      const novo = atual + 0.10;
+                      setExtrasDinamicos({
+                        ...extrasDinamicos,
+                        [v.nome]: novo.toFixed(2),
                       });
                     }}
                   >
                     +0.10
                   </button>
 
+                  {/* +1 */}
                   <button
                     className="btn-inc"
                     onClick={() => {
                       const atual = parseFloat(extrasDinamicos[v.nome]) || 0;
+                      const novo = atual + 1;
                       setExtrasDinamicos({
                         ...extrasDinamicos,
-                        [v.nome]: (atual + 1).toFixed(2),
+                        [v.nome]: novo.toFixed(2),
                       });
                     }}
                   >
                     +1
                   </button>
+
                 </div>
               </div>
             ))}
