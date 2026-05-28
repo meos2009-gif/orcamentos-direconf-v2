@@ -184,25 +184,57 @@ export default function FormularioPreco() {
           />
         </div>
 
+        {/* VARIÁVEIS EM GRELHA + BOTÕES */}
         <div className="form-card">
           <h3>Custos Variáveis</h3>
 
-          {variaveis.map((v) => (
-            <div key={v.id} className="linha-variavel">
-              <span>{v.nome}</span>
-              <input
-                type="number"
-                className="input-premium input-num"
-                value={extrasDinamicos[v.nome] || ""}
-                onChange={(e) =>
-                  setExtrasDinamicos({
-                    ...extrasDinamicos,
-                    [v.nome]: e.target.value,
-                  })
-                }
-              />
-            </div>
-          ))}
+          <div className="variaveis-grid">
+            {variaveis.map((v) => (
+              <div key={v.id} className="variavel-item">
+                <span>{v.nome}</span>
+
+                <div className="variavel-input-row">
+                  <input
+                    type="number"
+                    className="input-premium input-num"
+                    value={extrasDinamicos[v.nome] || ""}
+                    onChange={(e) =>
+                      setExtrasDinamicos({
+                        ...extrasDinamicos,
+                        [v.nome]: e.target.value,
+                      })
+                    }
+                  />
+
+                  <button
+                    className="btn-inc"
+                    onClick={() => {
+                      const atual = parseFloat(extrasDinamicos[v.nome]) || 0;
+                      setExtrasDinamicos({
+                        ...extrasDinamicos,
+                        [v.nome]: (atual + 0.10).toFixed(2),
+                      });
+                    }}
+                  >
+                    +0.10
+                  </button>
+
+                  <button
+                    className="btn-inc"
+                    onClick={() => {
+                      const atual = parseFloat(extrasDinamicos[v.nome]) || 0;
+                      setExtrasDinamicos({
+                        ...extrasDinamicos,
+                        [v.nome]: (atual + 1).toFixed(2),
+                      });
+                    }}
+                  >
+                    +1
+                  </button>
+                </div>
+              </div>
+            ))}
+          </div>
         </div>
 
       </div>
