@@ -27,6 +27,13 @@ export default function FormularioPreco() {
 
   const [precoCliente, setPrecoCliente] = useState("");
 
+  // Função de arredondamento segura
+  const arred = (n) => {
+    const v = parseFloat(n);
+    if (isNaN(v)) return 0;
+    return Number(v.toFixed(2));
+  };
+
   // Carregar variáveis
   useEffect(() => {
     async function carregar() {
@@ -86,19 +93,17 @@ export default function FormularioPreco() {
     carregarFicha();
   }, [idFicha, duplicarId]);
 
-  // Cálculos com arredondamento
-  const arred = (n) => Number(parseFloat(n || 0).toFixed(2));
-
+  // Cálculos seguros
   const custoTecido1 = arred(tecido1.consumo * tecido1.preco);
   const custoTecido2 = arred(tecido2.consumo * tecido2.preco);
 
   const custoTotalTecidos = arred(custoTecido1 + custoTecido2);
 
   const totalExtras = arred(
-    Object.values(extrasDinamicos).reduce(
-      (acc, v) => acc + (parseFloat(v) || 0),
-      0
-    )
+    Object.values(extrasDinamicos).reduce((acc, v) => {
+      const num = parseFloat(v);
+      return acc + (isNaN(num) ? 0 : num);
+    }, 0)
   );
 
   const margemNum = parseFloat(margem || 0);
